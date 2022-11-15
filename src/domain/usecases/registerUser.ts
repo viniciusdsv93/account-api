@@ -1,7 +1,6 @@
 export type RegisterUserModel = {
 	username: string;
 	password: string;
-	passwordConfirmation: string;
 };
 
 export type UserModelWithoutAccountId = {
