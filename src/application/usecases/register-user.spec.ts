@@ -75,4 +75,12 @@ describe("Register User Usecase", () => {
 			password: "hashed_password",
 		});
 	});
+
+	test("Should get users id on AddUserRepository success", async () => {
+		const { sut, addUserRepositoryStub } = makeSut();
+		const addUserRepositoryResponse = await addUserRepositoryStub.add(
+			makeFakeUserData()
+		);
+		expect(addUserRepositoryResponse).toHaveProperty("id");
+	});
 });
