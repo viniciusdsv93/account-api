@@ -1,5 +1,5 @@
 import { UserModel } from "../../domain/models/user";
-import { IRegisterUser, RegisterUserModel } from "../../domain/usecases/registerUser";
+import { IRegisterUser, RegisterUserModel } from "../../domain/usecases/register-user";
 import { IAddUserRepository } from "../protocols/add-user-repository";
 import { IEncrypter } from "../protocols/encrypter";
 

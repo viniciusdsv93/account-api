@@ -4,7 +4,7 @@ import {
 	IRegisterUser,
 	RegisterUserModel,
 	UserModelWithoutAccountId,
-} from "../../../domain/usecases/registerUser";
+} from "../../../domain/usecases/register-user";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { ServerError } from "../../errors/server-error";

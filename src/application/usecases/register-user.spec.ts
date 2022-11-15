@@ -1,7 +1,7 @@
 import {
 	RegisterUserModel,
 	UserModelWithoutAccountId,
-} from "../../domain/usecases/registerUser";
+} from "../../domain/usecases/register-user";
 import { IAddUserRepository } from "../protocols/add-user-repository";
 import { IEncrypter } from "../protocols/encrypter";
 import { RegisterUser } from "./register-user";
@@ -65,15 +65,6 @@ describe("Register User Usecase", () => {
 		await sut.execute(makeFakeUserData());
 		expect(encrypterStubSpy).toHaveBeenCalledWith("Valid_password1");
 	});
-
-	// test("Should throw an error if Encrypter throws", async () => {
-	// 	const { sut, encrypterStub } = makeSut();
-	// 	jest.spyOn(encrypterStub, "encrypt").mockReturnValueOnce(
-	// 		new Promise((resolve, reject) => reject(new Error()))
-	// 	);
-	// 	const promise = await sut.execute(makeFakeUserData());
-	// 	await expect(promise).rejects.toThrow();
-	// });
 
 	test("Should call AddUserRepository with the correct values", async () => {
 		const { sut, addUserRepositoryStub } = makeSut();

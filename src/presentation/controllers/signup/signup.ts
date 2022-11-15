@@ -1,5 +1,5 @@
 import { IUsernameAvailableRepository } from "../../../application/protocols/username-available-repository";
-import { IRegisterUser } from "../../../domain/usecases/registerUser";
+import { IRegisterUser } from "../../../domain/usecases/register-user";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { badRequest, ok, serverError } from "../../helpers/http";
