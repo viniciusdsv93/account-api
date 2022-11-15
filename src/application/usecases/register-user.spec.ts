@@ -1,7 +1,9 @@
+import { AccountModel } from "../../domain/models/account";
 import {
 	RegisterUserModel,
 	UserModelWithoutAccountId,
 } from "../../domain/usecases/register-user";
+import { IAddAccountRepository } from "../protocols/add-account-repository";
 import { IAddUserRepository } from "../protocols/add-user-repository";
 import { IEncrypter } from "../protocols/encrypter";
 import { RegisterUser } from "./register-user";
@@ -26,6 +28,22 @@ const makeAddUserRepositoryStub = (): IAddUserRepository => {
 	return new AddUserRepositoryStub();
 };
 
+const makeAddAccountRepositoryStub = (): IAddAccountRepository => {
+	class AddAccountRepositoryStub implements IAddAccountRepository {
+		async add(userId: string): Promise<AccountModel> {
+			return await new Promise((resolve) => resolve(makeFakeAccount()));
+		}
+	}
+	return new AddAccountRepositoryStub();
+};
+
+const makeFakeAccount = (): AccountModel => {
+	return {
+		id: "valid_id",
+		balance: 100,
+	};
+};
+
 const makeFakeUserData = (): RegisterUserModel => {
 	return {
 		username: "valid_username",
@@ -45,16 +63,23 @@ type SutTypes = {
 	sut: RegisterUser;
 	encrypterStub: IEncrypter;
 	addUserRepositoryStub: IAddUserRepository;
+	addAccountRepositoryStub: IAddAccountRepository;
 };
 
 const makeSut = (): SutTypes => {
 	const addUserRepositoryStub = makeAddUserRepositoryStub();
+	const addAccountRepositoryStub = makeAddAccountRepositoryStub();
 	const encrypterStub = makeEncrypterStub();
-	const sut = new RegisterUser(encrypterStub, addUserRepositoryStub);
+	const sut = new RegisterUser(
+		encrypterStub,
+		addUserRepositoryStub,
+		addAccountRepositoryStub
+	);
 	return {
 		sut,
 		encrypterStub,
 		addUserRepositoryStub,
+		addAccountRepositoryStub,
 	};
 };
 
@@ -77,10 +102,17 @@ describe("Register User Usecase", () => {
 	});
 
 	test("Should get users id on AddUserRepository success", async () => {
-		const { sut, addUserRepositoryStub } = makeSut();
+		const { addUserRepositoryStub } = makeSut();
 		const addUserRepositoryResponse = await addUserRepositoryStub.add(
 			makeFakeUserData()
 		);
 		expect(addUserRepositoryResponse).toHaveProperty("id");
+	});
+
+	test("Should call AddAccountRepository if AddUserRepository succeed", async () => {
+		const { sut, addAccountRepositoryStub } = makeSut();
+		const addAccountSpy = jest.spyOn(addAccountRepositoryStub, "add");
+		await sut.execute(makeFakeUserData());
+		expect(addAccountSpy).toHaveBeenCalled();
 	});
 });
