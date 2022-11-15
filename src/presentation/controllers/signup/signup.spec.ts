@@ -8,7 +8,7 @@ import {
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { ServerError } from "../../errors/server-error";
-import { badRequest, serverError } from "../../helpers/http";
+import { badRequest, ok, serverError } from "../../helpers/http";
 import { HttpRequest } from "../../protocols/http";
 import { SignUpController } from "./signup";
 
@@ -229,5 +229,19 @@ describe("Sign Up Controller", () => {
 			username: "any_username",
 			password: "Any_password1",
 		});
+	});
+
+	test("Should return an UserModel on success", async () => {
+		const { sut } = makeSut();
+
+		const httpResponse = await sut.handle(makeFakeRequest());
+		expect(httpResponse).toEqual(
+			ok({
+				id: "1",
+				username: "valid_username",
+				password: "valid_password",
+				accountId: "2",
+			})
+		);
 	});
 });
