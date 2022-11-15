@@ -95,7 +95,29 @@ describe("Sign Up Controller", () => {
 		};
 		const httpResponse = await sut.handle(httpRequest);
 		expect(httpResponse).toEqual(
-			badRequest(new InvalidParamError("passwordConfirmation"))
+			badRequest(
+				new InvalidParamError("passwordConfirmation", "passwords do not match")
+			)
+		);
+	});
+
+	test("Should return 400 if username has less than 3 characters", async () => {
+		const { sut } = makeSut();
+		const httpRequest = {
+			body: {
+				username: "a",
+				password: "any_password",
+				passwordConfirmation: "another_password",
+			},
+		};
+		const httpResponse = await sut.handle(httpRequest);
+		expect(httpResponse).toEqual(
+			badRequest(
+				new InvalidParamError(
+					"username",
+					"username must have at least 3 characters"
+				)
+			)
 		);
 	});
 
