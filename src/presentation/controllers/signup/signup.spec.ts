@@ -14,8 +14,8 @@ describe("Sign Up Controller", () => {
 		return {
 			body: {
 				username: "any_username",
-				password: "any_password",
-				passwordConfirmation: "any_password",
+				password: "any_password1",
+				passwordConfirmation: "any_password1",
 			},
 		};
 	};
@@ -89,7 +89,7 @@ describe("Sign Up Controller", () => {
 		const httpRequest = {
 			body: {
 				username: "any_username",
-				password: "any_password",
+				password: "any_password1",
 				passwordConfirmation: "another_password",
 			},
 		};
@@ -141,13 +141,33 @@ describe("Sign Up Controller", () => {
 		);
 	});
 
+	test("Should return 400 if password dont have at least 1 numeric character", async () => {
+		const { sut } = makeSut();
+		const httpRequest = {
+			body: {
+				username: "any_username",
+				password: "any_password",
+				passwordConfirmation: "any_password",
+			},
+		};
+		const httpResponse = await sut.handle(httpRequest);
+		expect(httpResponse).toEqual(
+			badRequest(
+				new InvalidParamError(
+					"password",
+					"password must have at least 1 numeric character"
+				)
+			)
+		);
+	});
+
 	test("Should call RegisterUserUsecase with correct values", async () => {
 		const { sut, registerUserStub } = makeSut();
 		const registerUserSpy = jest.spyOn(registerUserStub, "execute");
 		await sut.handle(makeFakeRequest());
 		expect(registerUserSpy).toHaveBeenCalledWith({
 			username: "any_username",
-			password: "any_password",
+			password: "any_password1",
 		});
 	});
 });
