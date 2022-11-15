@@ -1,17 +1,38 @@
+import {
+	RegisterUser,
+	RegisterUserModel,
+	UserModelWithoutAccountId,
+} from "../../../domain/usecases/registerUser";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { badRequest } from "../../helpers/http";
 import { SignUpController } from "./signup";
 
 describe("Sign Up Controller", () => {
+	const makeRegisterUserStub = (): RegisterUser => {
+		class RegisterUserStub implements RegisterUser {
+			async execute(user: RegisterUserModel): Promise<UserModelWithoutAccountId> {
+				return {
+					id: "1",
+					username: "valid_username",
+					password: "valid_password",
+				};
+			}
+		}
+		return new RegisterUserStub();
+	};
+
 	type SutTypes = {
 		sut: SignUpController;
+		registerUserStub: RegisterUser;
 	};
 
 	const makeSut = (): SutTypes => {
-		const sut = new SignUpController();
+		const registerUserStub = makeRegisterUserStub();
+		const sut = new SignUpController(registerUserStub);
 		return {
 			sut,
+			registerUserStub,
 		};
 	};
 
@@ -66,5 +87,22 @@ describe("Sign Up Controller", () => {
 		expect(httpResponse).toEqual(
 			badRequest(new InvalidParamError("passwordConfirmation"))
 		);
+	});
+
+	test("Should call RegisterUserUsecase with correct values", async () => {
+		const { sut, registerUserStub } = makeSut();
+		const registerUserSpy = jest.spyOn(registerUserStub, "execute");
+		const httpRequest = {
+			body: {
+				username: "any_username",
+				password: "any_password",
+				passwordConfirmation: "any_password",
+			},
+		};
+		await sut.handle(httpRequest);
+		expect(registerUserSpy).toHaveBeenCalledWith({
+			username: "any_username",
+			password: "any_password",
+		});
 	});
 });
