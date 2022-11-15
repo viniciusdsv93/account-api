@@ -1,3 +1,5 @@
+import { UserModel } from "../models/user";
+
 export type RegisterUserModel = {
 	username: string;
 	password: string;
@@ -10,5 +12,5 @@ export type UserModelWithoutAccountId = {
 };
 
 export interface RegisterUser {
-	execute: (user: RegisterUserModel) => Promise<UserModelWithoutAccountId>;
+	execute: (user: RegisterUserModel) => Promise<UserModel>;
 }

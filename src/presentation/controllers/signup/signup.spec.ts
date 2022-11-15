@@ -1,4 +1,5 @@
 import { UsernameAvailableRepository } from "../../../application/protocols/username-available-repository";
+import { UserModel } from "../../../domain/models/user";
 import {
 	RegisterUser,
 	RegisterUserModel,
@@ -33,11 +34,12 @@ describe("Sign Up Controller", () => {
 
 	const makeRegisterUserStub = (): RegisterUser => {
 		class RegisterUserStub implements RegisterUser {
-			async execute(user: RegisterUserModel): Promise<UserModelWithoutAccountId> {
+			async execute(user: RegisterUserModel): Promise<UserModel> {
 				return {
 					id: "1",
 					username: "valid_username",
 					password: "valid_password",
+					accountId: "2",
 				};
 			}
 		}
