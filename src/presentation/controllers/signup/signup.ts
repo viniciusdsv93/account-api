@@ -22,8 +22,19 @@ export class SignUpController implements Controller {
 
 		const { username, password, passwordConfirmation } = httpRequest.body;
 
+		if (username.length < 3) {
+			return badRequest(
+				new InvalidParamError(
+					"username",
+					"username must have at least 3 characters"
+				)
+			);
+		}
+
 		if (password !== passwordConfirmation) {
-			return badRequest(new InvalidParamError("passwordConfirmation"));
+			return badRequest(
+				new InvalidParamError("passwordConfirmation", "passwords do not match")
+			);
 		}
 
 		await this.registerUser.execute({ username, password });
