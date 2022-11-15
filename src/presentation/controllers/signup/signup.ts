@@ -31,6 +31,17 @@ export class SignUpController implements Controller {
 			);
 		}
 
+		// TODO = ENSURE USERNAME IS UNIQUE
+
+		if (password.length < 8) {
+			return badRequest(
+				new InvalidParamError(
+					"password",
+					"password must have at least 8 characters"
+				)
+			);
+		}
+
 		if (password !== passwordConfirmation) {
 			return badRequest(
 				new InvalidParamError("passwordConfirmation", "passwords do not match")
