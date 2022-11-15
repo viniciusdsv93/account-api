@@ -6,9 +6,19 @@ import {
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { badRequest } from "../../helpers/http";
+import { HttpRequest } from "../../protocols/http";
 import { SignUpController } from "./signup";
 
 describe("Sign Up Controller", () => {
+	const makeFakeRequest = (): HttpRequest => {
+		return {
+			body: {
+				username: "any_username",
+				password: "any_password",
+				passwordConfirmation: "any_password",
+			},
+		};
+	};
 	const makeRegisterUserStub = (): RegisterUser => {
 		class RegisterUserStub implements RegisterUser {
 			async execute(user: RegisterUserModel): Promise<UserModelWithoutAccountId> {
@@ -92,14 +102,7 @@ describe("Sign Up Controller", () => {
 	test("Should call RegisterUserUsecase with correct values", async () => {
 		const { sut, registerUserStub } = makeSut();
 		const registerUserSpy = jest.spyOn(registerUserStub, "execute");
-		const httpRequest = {
-			body: {
-				username: "any_username",
-				password: "any_password",
-				passwordConfirmation: "any_password",
-			},
-		};
-		await sut.handle(httpRequest);
+		await sut.handle(makeFakeRequest());
 		expect(registerUserSpy).toHaveBeenCalledWith({
 			username: "any_username",
 			password: "any_password",
