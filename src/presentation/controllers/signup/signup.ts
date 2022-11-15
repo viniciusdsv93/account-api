@@ -1,3 +1,4 @@
+import { UsernameAvailableRepository } from "../../../application/protocols/username-available-repository";
 import { RegisterUser } from "../../../domain/usecases/registerUser";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
@@ -7,9 +8,14 @@ import { HttpRequest, HttpResponse } from "../../protocols/http";
 
 export class SignUpController implements Controller {
 	private readonly registerUser: RegisterUser;
+	private readonly usernameRepository: UsernameAvailableRepository;
 
-	constructor(registerUser: RegisterUser) {
+	constructor(
+		registerUser: RegisterUser,
+		usernameRepository: UsernameAvailableRepository
+	) {
 		this.registerUser = registerUser;
+		this.usernameRepository = usernameRepository;
 	}
 
 	async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -32,7 +38,15 @@ export class SignUpController implements Controller {
 				);
 			}
 
-			// TODO = ENSURE USERNAME IS UNIQUE
+			const isUsernameAvailable = await this.usernameRepository.isAvailable(
+				username
+			);
+
+			if (!isUsernameAvailable) {
+				return badRequest(
+					new InvalidParamError("username", "username already in use")
+				);
+			}
 
 			if (password.length < 8) {
 				return badRequest(
