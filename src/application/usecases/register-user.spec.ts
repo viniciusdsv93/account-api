@@ -1,9 +1,11 @@
 import { AccountModel } from "../../domain/models/account";
+import { UserModel } from "../../domain/models/user";
 import {
 	RegisterUserModel,
 	UserModelWithoutAccountId,
 } from "../../domain/usecases/register-user";
 import { IAddAccountRepository } from "../protocols/add-account-repository";
+import { IAddAccountToUserRepository } from "../protocols/add-account-to-user-repository";
 import { IAddUserRepository } from "../protocols/add-user-repository";
 import { IEncrypter } from "../protocols/encrypter";
 import { RegisterUser } from "./register-user";
@@ -37,6 +39,15 @@ const makeAddAccountRepositoryStub = (): IAddAccountRepository => {
 	return new AddAccountRepositoryStub();
 };
 
+const makeAddAccountIdToUserRepositoryStub = (): IAddAccountToUserRepository => {
+	class AddAccountIdToUserRepositoryStub implements IAddAccountToUserRepository {
+		change(userId: string, accountId: string): Promise<UserModel> {
+			throw new Error("Method not implemented.");
+		}
+	}
+	return new AddAccountIdToUserRepositoryStub();
+};
+
 const makeFakeAccount = (): AccountModel => {
 	return {
 		id: "valid_id",
@@ -64,22 +75,26 @@ type SutTypes = {
 	encrypterStub: IEncrypter;
 	addUserRepositoryStub: IAddUserRepository;
 	addAccountRepositoryStub: IAddAccountRepository;
+	addAccountIdToUserRepositoryStub: IAddAccountToUserRepository;
 };
 
 const makeSut = (): SutTypes => {
 	const addUserRepositoryStub = makeAddUserRepositoryStub();
 	const addAccountRepositoryStub = makeAddAccountRepositoryStub();
+	const addAccountIdToUserRepositoryStub = makeAddAccountIdToUserRepositoryStub();
 	const encrypterStub = makeEncrypterStub();
 	const sut = new RegisterUser(
 		encrypterStub,
 		addUserRepositoryStub,
-		addAccountRepositoryStub
+		addAccountRepositoryStub,
+		addAccountIdToUserRepositoryStub
 	);
 	return {
 		sut,
 		encrypterStub,
 		addUserRepositoryStub,
 		addAccountRepositoryStub,
+		addAccountIdToUserRepositoryStub,
 	};
 };
 
