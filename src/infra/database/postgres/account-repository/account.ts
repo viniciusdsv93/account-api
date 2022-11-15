@@ -3,10 +3,15 @@ import { AccountModel } from "../../../../domain/models/account";
 import { prismaClient } from "../prisma/prisma-client";
 
 export class AccountPrismaRepository implements IAddAccountRepository {
-	async add(): Promise<AccountModel> {
+	async add(userId: string): Promise<AccountModel> {
 		return await prismaClient.account.create({
 			data: {
 				balance: 100,
+				User: {
+					connect: {
+						id: userId,
+					},
+				},
 			},
 		});
 	}
