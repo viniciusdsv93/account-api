@@ -121,6 +121,26 @@ describe("Sign Up Controller", () => {
 		);
 	});
 
+	test("Should return 400 if password has less than 8 characters", async () => {
+		const { sut } = makeSut();
+		const httpRequest = {
+			body: {
+				username: "any_username",
+				password: "a",
+				passwordConfirmation: "a",
+			},
+		};
+		const httpResponse = await sut.handle(httpRequest);
+		expect(httpResponse).toEqual(
+			badRequest(
+				new InvalidParamError(
+					"password",
+					"password must have at least 8 characters"
+				)
+			)
+		);
+	});
+
 	test("Should call RegisterUserUsecase with correct values", async () => {
 		const { sut, registerUserStub } = makeSut();
 		const registerUserSpy = jest.spyOn(registerUserStub, "execute");
