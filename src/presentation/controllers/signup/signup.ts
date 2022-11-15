@@ -42,13 +42,24 @@ export class SignUpController implements Controller {
 			);
 		}
 
-		const regex = /\d/;
+		const numericRegex = /\d/;
 
-		if (!regex.test(password)) {
+		if (!numericRegex.test(password)) {
 			return badRequest(
 				new InvalidParamError(
 					"password",
 					"password must have at least 1 numeric character"
+				)
+			);
+		}
+
+		const uppercaseRegex = /[A-Z]/;
+
+		if (!uppercaseRegex.test(password)) {
+			return badRequest(
+				new InvalidParamError(
+					"password",
+					"password must have at least 1 uppercase letter"
 				)
 			);
 		}
