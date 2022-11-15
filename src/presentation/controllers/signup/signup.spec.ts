@@ -1,8 +1,19 @@
 import { SignUpController } from "./signup";
 
 describe("Sign Up Controller", () => {
-	test("Should return 400 if no username is provided", async () => {
+	type SutTypes = {
+		sut: SignUpController;
+	};
+
+	const makeSut = (): SutTypes => {
 		const sut = new SignUpController();
+		return {
+			sut,
+		};
+	};
+
+	test("Should return 400 if no username is provided", async () => {
+		const { sut } = makeSut();
 		const httpRequest = {
 			body: {
 				password: "any_password",
@@ -14,7 +25,7 @@ describe("Sign Up Controller", () => {
 	});
 
 	test("Should return 400 if no password is provided", async () => {
-		const sut = new SignUpController();
+		const { sut } = makeSut();
 		const httpRequest = {
 			body: {
 				username: "any_username",
@@ -26,7 +37,7 @@ describe("Sign Up Controller", () => {
 	});
 
 	test("Should return 400 if no passwordConfirmation is provided", async () => {
-		const sut = new SignUpController();
+		const { sut } = makeSut();
 		const httpRequest = {
 			body: {
 				username: "any_username",
