@@ -1,3 +1,5 @@
+import { MissingParamError } from "../../errors/missing-param-error";
+import { badRequest } from "../../helpers/http";
 import { SignUpController } from "./signup";
 
 describe("Sign Up Controller", () => {
@@ -21,7 +23,7 @@ describe("Sign Up Controller", () => {
 			},
 		};
 		const httpResponse = await sut.handle(httpRequest);
-		expect(httpResponse.statusCode).toBe(400);
+		expect(httpResponse).toEqual(badRequest(new MissingParamError("username")));
 	});
 
 	test("Should return 400 if no password is provided", async () => {
@@ -33,7 +35,7 @@ describe("Sign Up Controller", () => {
 			},
 		};
 		const httpResponse = await sut.handle(httpRequest);
-		expect(httpResponse.statusCode).toBe(400);
+		expect(httpResponse).toEqual(badRequest(new MissingParamError("password")));
 	});
 
 	test("Should return 400 if no passwordConfirmation is provided", async () => {
@@ -45,7 +47,9 @@ describe("Sign Up Controller", () => {
 			},
 		};
 		const httpResponse = await sut.handle(httpRequest);
-		expect(httpResponse.statusCode).toBe(400);
+		expect(httpResponse).toEqual(
+			badRequest(new MissingParamError("passwordConfirmation"))
+		);
 	});
 
 	test("Should return 400 if passwordConfirmation is invalid", async () => {
