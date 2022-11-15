@@ -1,5 +1,5 @@
-import { UsernameAvailableRepository } from "../../../application/protocols/username-available-repository";
-import { RegisterUser } from "../../../domain/usecases/registerUser";
+import { IUsernameAvailableRepository } from "../../../application/protocols/username-available-repository";
+import { IRegisterUser } from "../../../domain/usecases/registerUser";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { badRequest, ok, serverError } from "../../helpers/http";
@@ -7,12 +7,12 @@ import { Controller } from "../../protocols/controller";
 import { HttpRequest, HttpResponse } from "../../protocols/http";
 
 export class SignUpController implements Controller {
-	private readonly registerUser: RegisterUser;
-	private readonly usernameRepository: UsernameAvailableRepository;
+	private readonly registerUser: IRegisterUser;
+	private readonly usernameRepository: IUsernameAvailableRepository;
 
 	constructor(
-		registerUser: RegisterUser,
-		usernameRepository: UsernameAvailableRepository
+		registerUser: IRegisterUser,
+		usernameRepository: IUsernameAvailableRepository
 	) {
 		this.registerUser = registerUser;
 		this.usernameRepository = usernameRepository;

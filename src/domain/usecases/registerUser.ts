@@ -11,6 +11,6 @@ export type UserModelWithoutAccountId = {
 	password: string;
 };
 
-export interface RegisterUser {
-	execute: (user: RegisterUserModel) => Promise<UserModel>;
+export interface IRegisterUser {
+	execute(user: RegisterUserModel): Promise<UserModel>;
 }

@@ -1,3 +1,3 @@
-export interface UsernameAvailableRepository {
+export interface IUsernameAvailableRepository {
 	isAvailable(username: string): Promise<boolean>;
 }

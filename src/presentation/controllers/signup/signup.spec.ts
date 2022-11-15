@@ -1,7 +1,7 @@
-import { UsernameAvailableRepository } from "../../../application/protocols/username-available-repository";
+import { IUsernameAvailableRepository } from "../../../application/protocols/username-available-repository";
 import { UserModel } from "../../../domain/models/user";
 import {
-	RegisterUser,
+	IRegisterUser,
 	RegisterUserModel,
 	UserModelWithoutAccountId,
 } from "../../../domain/usecases/registerUser";
@@ -23,8 +23,8 @@ describe("Sign Up Controller", () => {
 		};
 	};
 
-	const makeUsernameAvailableRepositoryStub = (): UsernameAvailableRepository => {
-		class UsernameAvailableRepositoryStub implements UsernameAvailableRepository {
+	const makeUsernameAvailableRepositoryStub = (): IUsernameAvailableRepository => {
+		class UsernameAvailableRepositoryStub implements IUsernameAvailableRepository {
 			async isAvailable(username: string): Promise<boolean> {
 				return await new Promise((resolve) => resolve(true));
 			}
@@ -32,8 +32,8 @@ describe("Sign Up Controller", () => {
 		return new UsernameAvailableRepositoryStub();
 	};
 
-	const makeRegisterUserStub = (): RegisterUser => {
-		class RegisterUserStub implements RegisterUser {
+	const makeRegisterUserStub = (): IRegisterUser => {
+		class RegisterUserStub implements IRegisterUser {
 			async execute(user: RegisterUserModel): Promise<UserModel> {
 				return {
 					id: "1",
@@ -48,8 +48,8 @@ describe("Sign Up Controller", () => {
 
 	type SutTypes = {
 		sut: SignUpController;
-		registerUserStub: RegisterUser;
-		usernameAvailableRepositoryStub: UsernameAvailableRepository;
+		registerUserStub: IRegisterUser;
+		usernameAvailableRepositoryStub: IUsernameAvailableRepository;
 	};
 
 	const makeSut = (): SutTypes => {
