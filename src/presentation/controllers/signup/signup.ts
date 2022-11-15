@@ -2,7 +2,7 @@ import { UsernameAvailableRepository } from "../../../application/protocols/user
 import { RegisterUser } from "../../../domain/usecases/registerUser";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
-import { badRequest, serverError } from "../../helpers/http";
+import { badRequest, ok, serverError } from "../../helpers/http";
 import { Controller } from "../../protocols/controller";
 import { HttpRequest, HttpResponse } from "../../protocols/http";
 
@@ -88,12 +88,9 @@ export class SignUpController implements Controller {
 				);
 			}
 
-			await this.registerUser.execute({ username, password });
+			const createdUser = await this.registerUser.execute({ username, password });
 
-			return {
-				statusCode: 0,
-				body: "",
-			};
+			return ok(createdUser);
 		} catch (error) {
 			return serverError(error as Error);
 		}
