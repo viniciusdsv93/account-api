@@ -1,4 +1,5 @@
 import { RegisterUserModel } from "../../../../domain/usecases/register-user";
+import { AccountPrismaRepository } from "../account-repository/account";
 import { prismaClient } from "../prisma/prisma-client";
 import { UserPrismaRepository } from "./user";
 
@@ -45,5 +46,14 @@ describe("User Prisma Repository", () => {
 		await sut.add(makeUserData());
 		const isAvailable = await sut.isAvailable("valid_username");
 		expect(isAvailable).toBe(false);
+	});
+
+	test("Should add an accountId on User", async () => {
+		const { sut } = makeSut();
+		const accountSut = new AccountPrismaRepository();
+		const createdUser = await sut.add(makeUserData());
+		const createdAccount = await accountSut.add(createdUser.id);
+		const modifiedUser = await sut.change(createdUser.id, createdAccount.id);
+		expect(modifiedUser.accountId).toEqual(createdAccount.id);
 	});
 });
