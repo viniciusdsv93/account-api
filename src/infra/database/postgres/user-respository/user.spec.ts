@@ -4,6 +4,7 @@ import { UserPrismaRepository } from "./user";
 
 describe("User Prisma Repository", () => {
 	beforeEach(async () => {
+		await prismaClient.account.deleteMany();
 		await prismaClient.user.deleteMany();
 	});
 
