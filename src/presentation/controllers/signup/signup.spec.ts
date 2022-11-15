@@ -11,4 +11,15 @@ describe("Sign Up Controller", () => {
 		const httpResponse = await sut.handle(httpRequest);
 		expect(httpResponse.statusCode).toBe(400);
 	});
+
+	test("Should return 400 if no password is provided", async () => {
+		const sut = new SignUpController();
+		const httpRequest = {
+			body: {
+				username: "any_username",
+			},
+		};
+		const httpResponse = await sut.handle(httpRequest);
+		expect(httpResponse.statusCode).toBe(400);
+	});
 });
