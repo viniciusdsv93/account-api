@@ -14,8 +14,8 @@ describe("Sign Up Controller", () => {
 		return {
 			body: {
 				username: "any_username",
-				password: "any_password1",
-				passwordConfirmation: "any_password1",
+				password: "Any_password1",
+				passwordConfirmation: "Any_password1",
 			},
 		};
 	};
@@ -84,23 +84,6 @@ describe("Sign Up Controller", () => {
 		);
 	});
 
-	test("Should return 400 if passwordConfirmation is invalid", async () => {
-		const { sut } = makeSut();
-		const httpRequest = {
-			body: {
-				username: "any_username",
-				password: "any_password1",
-				passwordConfirmation: "another_password",
-			},
-		};
-		const httpResponse = await sut.handle(httpRequest);
-		expect(httpResponse).toEqual(
-			badRequest(
-				new InvalidParamError("passwordConfirmation", "passwords do not match")
-			)
-		);
-	});
-
 	test("Should return 400 if username has less than 3 characters", async () => {
 		const { sut } = makeSut();
 		const httpRequest = {
@@ -161,13 +144,50 @@ describe("Sign Up Controller", () => {
 		);
 	});
 
+	test("Should return 400 if password dont have at least 1 uppercase letter", async () => {
+		const { sut } = makeSut();
+		const httpRequest = {
+			body: {
+				username: "any_username",
+				password: "any_password1",
+				passwordConfirmation: "any_password1",
+			},
+		};
+		const httpResponse = await sut.handle(httpRequest);
+		expect(httpResponse).toEqual(
+			badRequest(
+				new InvalidParamError(
+					"password",
+					"password must have at least 1 uppercase letter"
+				)
+			)
+		);
+	});
+
+	test("Should return 400 if passwordConfirmation is invalid", async () => {
+		const { sut } = makeSut();
+		const httpRequest = {
+			body: {
+				username: "any_username",
+				password: "Any_password1",
+				passwordConfirmation: "another_password",
+			},
+		};
+		const httpResponse = await sut.handle(httpRequest);
+		expect(httpResponse).toEqual(
+			badRequest(
+				new InvalidParamError("passwordConfirmation", "passwords do not match")
+			)
+		);
+	});
+
 	test("Should call RegisterUserUsecase with correct values", async () => {
 		const { sut, registerUserStub } = makeSut();
 		const registerUserSpy = jest.spyOn(registerUserStub, "execute");
 		await sut.handle(makeFakeRequest());
 		expect(registerUserSpy).toHaveBeenCalledWith({
 			username: "any_username",
-			password: "any_password1",
+			password: "Any_password1",
 		});
 	});
 });
