@@ -42,6 +42,17 @@ export class SignUpController implements Controller {
 			);
 		}
 
+		const regex = /\d/;
+
+		if (!regex.test(password)) {
+			return badRequest(
+				new InvalidParamError(
+					"password",
+					"password must have at least 1 numeric character"
+				)
+			);
+		}
+
 		if (password !== passwordConfirmation) {
 			return badRequest(
 				new InvalidParamError("passwordConfirmation", "passwords do not match")
