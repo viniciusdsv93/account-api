@@ -5,7 +5,8 @@ import {
 } from "../../../domain/usecases/registerUser";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
-import { badRequest } from "../../helpers/http";
+import { ServerError } from "../../errors/server-error";
+import { badRequest, serverError } from "../../helpers/http";
 import { HttpRequest } from "../../protocols/http";
 import { SignUpController } from "./signup";
 
@@ -179,6 +180,15 @@ describe("Sign Up Controller", () => {
 				new InvalidParamError("passwordConfirmation", "passwords do not match")
 			)
 		);
+	});
+
+	test("Should return 500 if RegisteUser throws", async () => {
+		const { sut, registerUserStub } = makeSut();
+		jest.spyOn(registerUserStub, "execute").mockImplementationOnce(async () => {
+			return await new Promise((resolve, reject) => reject(new Error()));
+		});
+		const httpResponse = await sut.handle(makeFakeRequest());
+		expect(httpResponse).toEqual(serverError(new ServerError("")));
 	});
 
 	test("Should call RegisterUserUsecase with correct values", async () => {
