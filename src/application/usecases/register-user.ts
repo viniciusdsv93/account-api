@@ -1,3 +1,4 @@
+import { AccountModel } from "../../domain/models/account";
 import { UserModel } from "../../domain/models/user";
 import { IRegisterUser, RegisterUserModel } from "../../domain/usecases/register-user";
 import { IAddAccountRepository } from "../protocols/add-account-repository";
@@ -28,17 +29,19 @@ export class RegisterUser implements IRegisterUser {
 			password: hashedPassword,
 		});
 
+		let createdAccount: AccountModel;
+
 		if (createdUser?.id) {
-			await this.addAccountRepository.add(createdUser.id);
+			createdAccount = await this.addAccountRepository.add(createdUser.id);
+		} else {
+			throw new Error("Error when trying to create a new user");
 		}
 
-		return await new Promise((resolve) =>
-			resolve({
-				id: "valid_id",
-				username: username,
-				password: password,
-				accountId: "valid_account_id",
-			})
-		);
+		return {
+			id: createdUser.id,
+			username: username,
+			password: password,
+			accountId: createdAccount.id,
+		};
 	}
 }
