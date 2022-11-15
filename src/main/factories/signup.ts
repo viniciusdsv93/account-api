@@ -13,7 +13,8 @@ export const makeSignUpController = (): Controller => {
 	const registerUser = new RegisterUser(
 		bcryptAdapter,
 		userPrismaRepository,
-		accountPrismaRepository
+		accountPrismaRepository,
+		userPrismaRepository
 	);
 	return new SignUpController(registerUser, userPrismaRepository);
 };
