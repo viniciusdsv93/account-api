@@ -47,4 +47,17 @@ describe("Sign Up Controller", () => {
 		const httpResponse = await sut.handle(httpRequest);
 		expect(httpResponse.statusCode).toBe(400);
 	});
+
+	test("Should return 400 if passwordConfirmation is invalid", async () => {
+		const { sut } = makeSut();
+		const httpRequest = {
+			body: {
+				username: "any_username",
+				password: "any_password",
+				passwordConfirmation: "another_password",
+			},
+		};
+		const httpResponse = await sut.handle(httpRequest);
+		expect(httpResponse.statusCode).toBe(400);
+	});
 });
