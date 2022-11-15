@@ -1,3 +1,4 @@
+import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { badRequest } from "../../helpers/http";
 import { SignUpController } from "./signup";
@@ -62,6 +63,8 @@ describe("Sign Up Controller", () => {
 			},
 		};
 		const httpResponse = await sut.handle(httpRequest);
-		expect(httpResponse.statusCode).toBe(400);
+		expect(httpResponse).toEqual(
+			badRequest(new InvalidParamError("passwordConfirmation"))
+		);
 	});
 });
