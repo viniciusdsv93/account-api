@@ -6,8 +6,19 @@ describe("User Prisma Repository", () => {
 		await prismaClient.user.deleteMany();
 	});
 
-	test("Should return an user on success", async () => {
+	type SutTypes = {
+		sut: UserPrismaRepository;
+	};
+
+	const makeSut = (): SutTypes => {
 		const sut = new UserPrismaRepository();
+		return {
+			sut,
+		};
+	};
+
+	test("Should return an user on success", async () => {
+		const { sut } = makeSut();
 		const createdUser = await sut.add({
 			username: "valid_username",
 			password: "Valid_password1",
@@ -18,14 +29,14 @@ describe("User Prisma Repository", () => {
 	});
 
 	test("Should return true if username is available", async () => {
-		const sut = new UserPrismaRepository();
-		const isAvailable = await sut.isAvailable("test_username");
+		const { sut } = makeSut();
+		const isAvailable = await sut.isAvailable("valid_username");
 		expect(isAvailable).toBe(true);
 	});
 
 	test("Should return false if username is unnavailable", async () => {
-		const sut = new UserPrismaRepository();
-		const createdUser = await sut.add({
+		const { sut } = makeSut();
+		await sut.add({
 			username: "valid_username",
 			password: "Valid_password1",
 		});
