@@ -1,3 +1,4 @@
+import { UsernameAvailableRepository } from "../../../application/protocols/username-available-repository";
 import {
 	RegisterUser,
 	RegisterUserModel,
@@ -20,6 +21,16 @@ describe("Sign Up Controller", () => {
 			},
 		};
 	};
+
+	const makeUsernameAvailableRepositoryStub = (): UsernameAvailableRepository => {
+		class UsernameAvailableRepositoryStub implements UsernameAvailableRepository {
+			async isAvailable(username: string): Promise<boolean> {
+				return await new Promise((resolve) => resolve(true));
+			}
+		}
+		return new UsernameAvailableRepositoryStub();
+	};
+
 	const makeRegisterUserStub = (): RegisterUser => {
 		class RegisterUserStub implements RegisterUser {
 			async execute(user: RegisterUserModel): Promise<UserModelWithoutAccountId> {
@@ -36,14 +47,20 @@ describe("Sign Up Controller", () => {
 	type SutTypes = {
 		sut: SignUpController;
 		registerUserStub: RegisterUser;
+		usernameAvailableRepositoryStub: UsernameAvailableRepository;
 	};
 
 	const makeSut = (): SutTypes => {
 		const registerUserStub = makeRegisterUserStub();
-		const sut = new SignUpController(registerUserStub);
+		const usernameAvailableRepositoryStub = makeUsernameAvailableRepositoryStub();
+		const sut = new SignUpController(
+			registerUserStub,
+			usernameAvailableRepositoryStub
+		);
 		return {
 			sut,
 			registerUserStub,
+			usernameAvailableRepositoryStub,
 		};
 	};
 
@@ -105,6 +122,17 @@ describe("Sign Up Controller", () => {
 		);
 	});
 
+	test("Should return 400 if username provided is already in use", async () => {
+		const { sut, usernameAvailableRepositoryStub } = makeSut();
+		jest.spyOn(usernameAvailableRepositoryStub, "isAvailable").mockReturnValueOnce(
+			new Promise((resolve) => resolve(false))
+		);
+		const httpResponse = await sut.handle(makeFakeRequest());
+		expect(httpResponse).toEqual(
+			badRequest(new InvalidParamError("username", "username already in use"))
+		);
+	});
+
 	test("Should return 400 if password has less than 8 characters", async () => {
 		const { sut } = makeSut();
 		const httpRequest = {
@@ -125,7 +153,7 @@ describe("Sign Up Controller", () => {
 		);
 	});
 
-	test("Should return 400 if password dont have at least 1 numeric character", async () => {
+	test("Should return 400 if password does not have at least 1 numeric character", async () => {
 		const { sut } = makeSut();
 		const httpRequest = {
 			body: {
@@ -145,7 +173,7 @@ describe("Sign Up Controller", () => {
 		);
 	});
 
-	test("Should return 400 if password dont have at least 1 uppercase letter", async () => {
+	test("Should return 400 if password does not have at least 1 uppercase letter", async () => {
 		const { sut } = makeSut();
 		const httpRequest = {
 			body: {
