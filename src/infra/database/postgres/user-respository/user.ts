@@ -1,5 +1,7 @@
+import { IAddAccountToUserRepository } from "../../../../application/protocols/add-account-to-user-repository";
 import { IAddUserRepository } from "../../../../application/protocols/add-user-repository";
 import { IUsernameAvailableRepository } from "../../../../application/protocols/username-available-repository";
+import { UserModel } from "../../../../domain/models/user";
 import {
 	RegisterUserModel,
 	UserModelWithoutAccountId,
@@ -7,8 +9,29 @@ import {
 import { prismaClient } from "../prisma/prisma-client";
 
 export class UserPrismaRepository
-	implements IAddUserRepository, IUsernameAvailableRepository
+	implements
+		IAddUserRepository,
+		IUsernameAvailableRepository,
+		IAddAccountToUserRepository
 {
+	async change(userId: string, accountId: string): Promise<UserModel> {
+		const modifiedUser = await prismaClient.user.update({
+			where: {
+				id: userId,
+			},
+			data: {
+				accountId: accountId,
+			},
+		});
+
+		return {
+			id: modifiedUser.id,
+			username: modifiedUser.username,
+			password: modifiedUser.password,
+			accountId: modifiedUser.accountId || "",
+		};
+	}
+
 	async isAvailable(username: string): Promise<boolean> {
 		const existsUser = await prismaClient.user.findFirst({
 			where: {
