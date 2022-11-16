@@ -1,5 +1,4 @@
 import { IFindByUsernameRepository } from "../../../application/protocols/find-by-username-repository";
-import { IUsernameAvailableRepository } from "../../../application/protocols/username-available-repository";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { badRequest, ok } from "../../helpers/http";
