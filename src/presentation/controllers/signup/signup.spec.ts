@@ -8,7 +8,7 @@ import {
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { ServerError } from "../../errors/server-error";
-import { badRequest, ok, serverError } from "../../helpers/http";
+import { badRequest, created, ok, serverError } from "../../helpers/http";
 import { HttpRequest } from "../../protocols/http";
 import { SignUpController } from "./signup";
 
@@ -236,7 +236,7 @@ describe("Sign Up Controller", () => {
 
 		const httpResponse = await sut.handle(makeFakeRequest());
 		expect(httpResponse).toEqual(
-			ok({
+			created({
 				id: "1",
 				username: "valid_username",
 				password: "valid_password",

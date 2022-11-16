@@ -41,8 +41,8 @@ const makeAddAccountRepositoryStub = (): IAddAccountRepository => {
 
 const makeAddAccountIdToUserRepositoryStub = (): IAddAccountToUserRepository => {
 	class AddAccountIdToUserRepositoryStub implements IAddAccountToUserRepository {
-		change(userId: string, accountId: string): Promise<UserModel> {
-			throw new Error("Method not implemented.");
+		async change(userId: string, accountId: string): Promise<UserModel> {
+			return await new Promise(resolve => resolve(makeFakeUserModel()))
 		}
 	}
 	return new AddAccountIdToUserRepositoryStub();
@@ -67,6 +67,15 @@ const makeFakeUserWithoutAccountId = (): UserModelWithoutAccountId => {
 		id: "valid_id",
 		username: "valid_username",
 		password: "Valid_password1",
+	};
+};
+
+const makeFakeUserModel = (): UserModel => {
+	return {
+		id: "valid_id",
+		username: "valid_username",
+		password: "Valid_password1",
+		accountId: 'account_id'
 	};
 };
 
