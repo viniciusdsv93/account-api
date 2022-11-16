@@ -2,7 +2,7 @@ import { IEncrypter } from "../../../application/protocols/encrypter";
 import { IFindByUsernameRepository } from "../../../application/protocols/find-by-username-repository";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
-import { badRequest, ok } from "../../helpers/http";
+import { badRequest, ok, unauthorized } from "../../helpers/http";
 import { Controller } from "../../protocols/controller";
 import { HttpRequest, HttpResponse } from "../../protocols/http";
 
@@ -36,7 +36,11 @@ export class LoginController implements Controller {
 			);
 		}
 
-		await this.encrypter.verify(password);
+		const isValidPassword = await this.encrypter.verify(password);
+
+		if (!isValidPassword) {
+			return unauthorized();
+		}
 
 		return ok("");
 	}
