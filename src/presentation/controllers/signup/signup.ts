@@ -90,6 +90,7 @@ export class SignUpController implements Controller {
 
 			const createdUser = await this.registerUser.execute({ username, password });
 
+			// TODO = FORMAT RESPONSE TO HIDE PASSWORD
 			return created(createdUser);
 		} catch (error) {
 			return serverError(error as Error);
