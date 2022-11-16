@@ -40,12 +40,7 @@ export class UserPrismaRepository
 			},
 		});
 
-		return {
-			id: modifiedUser.id,
-			username: modifiedUser.username,
-			password: modifiedUser.password,
-			accountId: modifiedUser.accountId || "",
-		};
+		return modifiedUser as UserModel;
 	}
 
 	async isAvailable(username: string): Promise<boolean> {
