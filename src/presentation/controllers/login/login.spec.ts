@@ -1,3 +1,4 @@
+import { IEncrypter } from "../../../application/protocols/encrypter";
 import { IFindByUsernameRepository } from "../../../application/protocols/find-by-username-repository";
 import { UserModel } from "../../../domain/models/user";
 import { InvalidParamError } from "../../errors/invalid-param-error";
@@ -32,17 +33,32 @@ describe("Login Controller", () => {
 		return new FindByUsernameRepositoryStub();
 	};
 
+	const makeEncrypterStub = (): IEncrypter => {
+		class EncrypterStub implements IEncrypter {
+			encrypt(password: string): Promise<string> {
+				throw new Error("Method not implemented.");
+			}
+			async verify(password: string): Promise<boolean> {
+				return new Promise((resolve) => resolve(true));
+			}
+		}
+		return new EncrypterStub();
+	};
+
 	type SutTypes = {
 		sut: LoginController;
 		findByUsernameRepositoryStub: IFindByUsernameRepository;
+		encrypterStub: IEncrypter;
 	};
 
 	const makeSut = (): SutTypes => {
 		const findByUsernameRepositoryStub = makeFindByUsernameRepositoryStub();
-		const sut = new LoginController(findByUsernameRepositoryStub);
+		const encrypterStub = makeEncrypterStub();
+		const sut = new LoginController(findByUsernameRepositoryStub, encrypterStub);
 		return {
 			sut,
 			findByUsernameRepositoryStub,
+			encrypterStub,
 		};
 	};
 
@@ -77,5 +93,12 @@ describe("Login Controller", () => {
 		expect(httpResponse).toEqual(
 			badRequest(new InvalidParamError("username", "invalid username or password"))
 		);
+	});
+
+	test("Should call Encrypter with the correct password", async () => {
+		const { sut, encrypterStub } = makeSut();
+		const encrypterSpy = jest.spyOn(encrypterStub, "verify");
+		await sut.handle(makeFakeRequest());
+		expect(encrypterSpy).toHaveBeenCalledWith("any_password");
 	});
 });

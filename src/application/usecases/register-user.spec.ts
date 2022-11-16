@@ -12,6 +12,9 @@ import { RegisterUser } from "./register-user";
 
 const makeEncrypterStub = (): IEncrypter => {
 	class EncrypterStub implements IEncrypter {
+		verify(password: string): Promise<boolean> {
+			throw new Error("Method not implemented.");
+		}
 		async encrypt(password: string): Promise<string> {
 			return await new Promise((resolve) => resolve("hashed_password"));
 		}
@@ -42,7 +45,7 @@ const makeAddAccountRepositoryStub = (): IAddAccountRepository => {
 const makeAddAccountIdToUserRepositoryStub = (): IAddAccountToUserRepository => {
 	class AddAccountIdToUserRepositoryStub implements IAddAccountToUserRepository {
 		async change(userId: string, accountId: string): Promise<UserModel> {
-			return await new Promise(resolve => resolve(makeFakeUserModel()))
+			return await new Promise((resolve) => resolve(makeFakeUserModel()));
 		}
 	}
 	return new AddAccountIdToUserRepositoryStub();
@@ -75,7 +78,7 @@ const makeFakeUserModel = (): UserModel => {
 		id: "valid_id",
 		username: "valid_username",
 		password: "Valid_password1",
-		accountId: 'account_id'
+		accountId: "account_id",
 	};
 };
 
