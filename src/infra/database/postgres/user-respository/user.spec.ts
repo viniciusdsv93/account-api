@@ -56,4 +56,11 @@ describe("User Prisma Repository", () => {
 		const modifiedUser = await sut.change(createdUser.id, createdAccount.id);
 		expect(modifiedUser.accountId).toEqual(createdAccount.id);
 	});
+
+	test("Should find and return an user by the username", async () => {
+		const { sut } = makeSut();
+		const createdUser = await sut.add(makeUserData());
+		const findUserByUsername = await sut.find(createdUser.username);
+		expect(findUserByUsername).toBeTruthy();
+	});
 });
