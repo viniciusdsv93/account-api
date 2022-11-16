@@ -3,7 +3,7 @@ import { IFindByUsernameRepository } from "../../../application/protocols/find-b
 import { UserModel } from "../../../domain/models/user";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
-import { badRequest } from "../../helpers/http";
+import { badRequest, unauthorized } from "../../helpers/http";
 import { HttpRequest } from "../../protocols/http";
 import { LoginController } from "./login";
 
@@ -100,5 +100,14 @@ describe("Login Controller", () => {
 		const encrypterSpy = jest.spyOn(encrypterStub, "verify");
 		await sut.handle(makeFakeRequest());
 		expect(encrypterSpy).toHaveBeenCalledWith("any_password");
+	});
+
+	test("Should return 401 if invalid password is provided", async () => {
+		const { sut, encrypterStub } = makeSut();
+		jest.spyOn(encrypterStub, "verify").mockReturnValueOnce(
+			new Promise((resolve) => resolve(false))
+		);
+		const httpResponse = await sut.handle(makeFakeRequest());
+		expect(httpResponse).toEqual(unauthorized());
 	});
 });
