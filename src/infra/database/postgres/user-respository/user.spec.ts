@@ -63,4 +63,11 @@ describe("User Prisma Repository", () => {
 		const findUserByUsername = await sut.find(createdUser.username);
 		expect(findUserByUsername).toBeTruthy();
 	});
+
+	test("Should return null if the username provided is not registered", async () => {
+		const { sut } = makeSut();
+		await sut.add(makeUserData());
+		const findUserByUsername = await sut.find("another_username");
+		expect(findUserByUsername).toBeNull();
+	});
 });
