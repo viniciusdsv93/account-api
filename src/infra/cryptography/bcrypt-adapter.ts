@@ -7,7 +7,7 @@ export class BcryptAdapter implements IEncrypter {
 	constructor(salt: number) {
 		this.salt = salt;
 	}
-	verify(password: string): Promise<string | null> {
+	verify(password: string): Promise<boolean> {
 		throw new Error("Method not implemented.");
 	}
 
