@@ -1,5 +1,6 @@
 import { IEncrypter } from "../../../application/protocols/cryptography/encrypter";
 import { IFindByUsernameRepository } from "../../../application/protocols/repositories/find-by-username-repository";
+import { IAuthentication } from "../../../domain/usecases/authentication";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { badRequest, ok, unauthorized } from "../../helpers/http";
@@ -8,14 +9,14 @@ import { HttpRequest, HttpResponse } from "../../protocols/http";
 
 export class LoginController implements Controller {
 	private readonly findByUsernameRepository: IFindByUsernameRepository;
-	private readonly encrypter: IEncrypter;
+	private readonly authentication: IAuthentication;
 
 	constructor(
 		findByUsernameRepository: IFindByUsernameRepository,
-		encrypter: IEncrypter
+		authentication: IAuthentication
 	) {
 		this.findByUsernameRepository = findByUsernameRepository;
-		this.encrypter = encrypter;
+		this.authentication = authentication;
 	}
 
 	async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -36,11 +37,7 @@ export class LoginController implements Controller {
 			);
 		}
 
-		const isValidPassword = await this.encrypter.verify(password);
-
-		if (!isValidPassword) {
-			return unauthorized();
-		}
+		await this.authentication.auth(username, password);
 
 		return ok("");
 	}
