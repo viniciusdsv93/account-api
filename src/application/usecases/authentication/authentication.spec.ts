@@ -56,4 +56,13 @@ describe("Authentication UseCase", () => {
 		const promise = sut.auth(makeFakeUserData());
 		await expect(promise).rejects.toThrow();
 	});
+
+	test("Should return null if FindUserByUsernameRepository returns null", async () => {
+		const { sut, findByUsername } = makeSut();
+		jest.spyOn(findByUsername, "find").mockReturnValueOnce(
+			new Promise((resolve) => resolve(null))
+		);
+		const accessToken = await sut.auth(makeFakeUserData());
+		expect(accessToken).toBeNull();
+	});
 });
