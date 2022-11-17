@@ -1,4 +1,4 @@
-import { IEncrypter } from "../../application/protocols/encrypter";
+import { IEncrypter } from "../../application/protocols/cryptography/encrypter";
 import bcrypt from "bcrypt";
 
 export class BcryptAdapter implements IEncrypter {

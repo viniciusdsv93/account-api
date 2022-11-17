@@ -1,4 +1,4 @@
-import { IAddAccountRepository } from "../../../../application/protocols/add-account-repository";
+import { IAddAccountRepository } from "../../../../application/protocols/repositories/add-account-repository";
 import { AccountModel } from "../../../../domain/models/account";
 import { prismaClient } from "../prisma/prisma-client";
 

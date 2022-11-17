@@ -1,10 +1,10 @@
 import { AccountModel } from "../../domain/models/account";
 import { UserModel } from "../../domain/models/user";
 import { IRegisterUser, RegisterUserModel } from "../../domain/usecases/register-user";
-import { IAddAccountRepository } from "../protocols/add-account-repository";
-import { IAddAccountToUserRepository } from "../protocols/add-account-to-user-repository";
-import { IAddUserRepository } from "../protocols/add-user-repository";
-import { IEncrypter } from "../protocols/encrypter";
+import { IAddAccountRepository } from "../protocols/repositories/add-account-repository";
+import { IAddAccountToUserRepository } from "../protocols/repositories/add-account-to-user-repository";
+import { IAddUserRepository } from "../protocols/repositories/add-user-repository";
+import { IEncrypter } from "../protocols/cryptography/encrypter";
 
 export class RegisterUser implements IRegisterUser {
 	private readonly encrypter: IEncrypter;

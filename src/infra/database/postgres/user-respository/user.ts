@@ -1,7 +1,7 @@
-import { IAddAccountToUserRepository } from "../../../../application/protocols/add-account-to-user-repository";
-import { IAddUserRepository } from "../../../../application/protocols/add-user-repository";
-import { IFindByUsernameRepository } from "../../../../application/protocols/find-by-username-repository";
-import { IUsernameAvailableRepository } from "../../../../application/protocols/username-available-repository";
+import { IAddAccountToUserRepository } from "../../../../application/protocols/repositories/add-account-to-user-repository";
+import { IAddUserRepository } from "../../../../application/protocols/repositories/add-user-repository";
+import { IFindByUsernameRepository } from "../../../../application/protocols/repositories/find-by-username-repository";
+import { IUsernameAvailableRepository } from "../../../../application/protocols/repositories/username-available-repository";
 import { UserModel } from "../../../../domain/models/user";
 import {
 	RegisterUserModel,

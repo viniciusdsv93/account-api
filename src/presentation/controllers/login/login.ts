@@ -1,5 +1,5 @@
-import { IEncrypter } from "../../../application/protocols/encrypter";
-import { IFindByUsernameRepository } from "../../../application/protocols/find-by-username-repository";
+import { IEncrypter } from "../../../application/protocols/cryptography/encrypter";
+import { IFindByUsernameRepository } from "../../../application/protocols/repositories/find-by-username-repository";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { badRequest, ok, unauthorized } from "../../helpers/http";
