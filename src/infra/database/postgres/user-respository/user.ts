@@ -1,6 +1,7 @@
 import { IAddAccountToUserRepository } from "../../../../application/protocols/repositories/add-account-to-user-repository";
 import { IAddUserRepository } from "../../../../application/protocols/repositories/add-user-repository";
 import { IFindByUsernameRepository } from "../../../../application/protocols/repositories/find-by-username-repository";
+import { IUpdateAccessTokenRepository } from "../../../../application/protocols/repositories/update-access-token-repository";
 import { IUsernameAvailableRepository } from "../../../../application/protocols/repositories/username-available-repository";
 import { UserModel } from "../../../../domain/models/user";
 import {
@@ -14,8 +15,20 @@ export class UserPrismaRepository
 		IAddUserRepository,
 		IUsernameAvailableRepository,
 		IAddAccountToUserRepository,
-		IFindByUsernameRepository
+		IFindByUsernameRepository,
+		IUpdateAccessTokenRepository
 {
+	async updateAccessToken(id: string, token: string): Promise<void> {
+		await prismaClient.user.update({
+			where: {
+				id: id,
+			},
+			data: {
+				accessToken: token,
+			},
+		});
+	}
+
 	async findByUsername(username: string): Promise<UserModel | null> {
 		const findUserByUsername = await prismaClient.user.findFirst({
 			where: {
