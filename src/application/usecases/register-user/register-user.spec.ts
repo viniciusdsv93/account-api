@@ -1,13 +1,13 @@
-import { AccountModel } from "../../domain/models/account";
-import { UserModel } from "../../domain/models/user";
+import { AccountModel } from "../../../domain/models/account";
+import { UserModel } from "../../../domain/models/user";
 import {
 	RegisterUserModel,
 	UserModelWithoutAccountId,
-} from "../../domain/usecases/register-user";
-import { IAddAccountRepository } from "../protocols/repositories/add-account-repository";
-import { IAddAccountToUserRepository } from "../protocols/repositories/add-account-to-user-repository";
-import { IAddUserRepository } from "../protocols/repositories/add-user-repository";
-import { IEncrypter } from "../protocols/cryptography/encrypter";
+} from "../../../domain/usecases/register-user";
+import { IAddAccountRepository } from "../../protocols/repositories/add-account-repository";
+import { IAddAccountToUserRepository } from "../../protocols/repositories/add-account-to-user-repository";
+import { IAddUserRepository } from "../../protocols/repositories/add-user-repository";
+import { IEncrypter } from "../../protocols/cryptography/encrypter";
 import { RegisterUser } from "./register-user";
 
 const makeEncrypterStub = (): IEncrypter => {
