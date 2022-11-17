@@ -1,5 +1,5 @@
 import { RegisterUser } from "../../application/usecases/register-user/register-user";
-import { BcryptAdapter } from "../../infra/cryptography/bcrypt-adapter";
+import { BcryptAdapter } from "../../infra/cryptography/bcrypt-adapter/bcrypt-adapter";
 import { AccountPrismaRepository } from "../../infra/database/postgres/account-repository/account";
 import { UserPrismaRepository } from "../../infra/database/postgres/user-respository/user";
 import { SignUpController } from "../../presentation/controllers/signup/signup";
