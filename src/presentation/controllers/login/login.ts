@@ -1,4 +1,3 @@
-import { IEncrypter } from "../../../application/protocols/cryptography/encrypter";
 import { IFindByUsernameRepository } from "../../../application/protocols/repositories/find-by-username-repository";
 import { IAuthentication } from "../../../domain/usecases/authentication";
 import { InvalidParamError } from "../../errors/invalid-param-error";

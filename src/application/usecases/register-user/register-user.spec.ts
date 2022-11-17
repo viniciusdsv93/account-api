@@ -7,19 +7,19 @@ import {
 import { IAddAccountRepository } from "../../protocols/repositories/add-account-repository";
 import { IAddAccountToUserRepository } from "../../protocols/repositories/add-account-to-user-repository";
 import { IAddUserRepository } from "../../protocols/repositories/add-user-repository";
-import { IEncrypter } from "../../protocols/cryptography/encrypter";
+import { IHasher } from "../../protocols/cryptography/hasher";
 import { RegisterUser } from "./register-user";
 
-const makeEncrypterStub = (): IEncrypter => {
-	class EncrypterStub implements IEncrypter {
+const makeHasherStub = (): IHasher => {
+	class HasherStub implements IHasher {
 		verify(password: string): Promise<boolean> {
 			throw new Error("Method not implemented.");
 		}
-		async encrypt(password: string): Promise<string> {
+		async hash(password: string): Promise<string> {
 			return await new Promise((resolve) => resolve("hashed_password"));
 		}
 	}
-	return new EncrypterStub();
+	return new HasherStub();
 };
 
 const makeAddUserRepositoryStub = (): IAddUserRepository => {
@@ -84,7 +84,7 @@ const makeFakeUserModel = (): UserModel => {
 
 type SutTypes = {
 	sut: RegisterUser;
-	encrypterStub: IEncrypter;
+	hasherStub: IHasher;
 	addUserRepositoryStub: IAddUserRepository;
 	addAccountRepositoryStub: IAddAccountRepository;
 	addAccountIdToUserRepositoryStub: IAddAccountToUserRepository;
@@ -94,16 +94,16 @@ const makeSut = (): SutTypes => {
 	const addUserRepositoryStub = makeAddUserRepositoryStub();
 	const addAccountRepositoryStub = makeAddAccountRepositoryStub();
 	const addAccountIdToUserRepositoryStub = makeAddAccountIdToUserRepositoryStub();
-	const encrypterStub = makeEncrypterStub();
+	const hasherStub = makeHasherStub();
 	const sut = new RegisterUser(
-		encrypterStub,
+		hasherStub,
 		addUserRepositoryStub,
 		addAccountRepositoryStub,
 		addAccountIdToUserRepositoryStub
 	);
 	return {
 		sut,
-		encrypterStub,
+		hasherStub,
 		addUserRepositoryStub,
 		addAccountRepositoryStub,
 		addAccountIdToUserRepositoryStub,
@@ -112,10 +112,10 @@ const makeSut = (): SutTypes => {
 
 describe("Register User Usecase", () => {
 	test("Should call Encrypter with the correct password", async () => {
-		const { sut, encrypterStub } = makeSut();
-		const encrypterStubSpy = jest.spyOn(encrypterStub, "encrypt");
+		const { sut, hasherStub } = makeSut();
+		const hasherStubSpy = jest.spyOn(hasherStub, "hash");
 		await sut.execute(makeFakeUserData());
-		expect(encrypterStubSpy).toHaveBeenCalledWith("Valid_password1");
+		expect(hasherStubSpy).toHaveBeenCalledWith("Valid_password1");
 	});
 
 	test("Should call AddUserRepository with the correct values", async () => {

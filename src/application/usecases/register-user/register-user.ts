@@ -4,21 +4,21 @@ import { IRegisterUser, RegisterUserModel } from "../../../domain/usecases/regis
 import { IAddAccountRepository } from "../../protocols/repositories/add-account-repository";
 import { IAddAccountToUserRepository } from "../../protocols/repositories/add-account-to-user-repository";
 import { IAddUserRepository } from "../../protocols/repositories/add-user-repository";
-import { IEncrypter } from "../../protocols/cryptography/encrypter";
+import { IHasher } from "../../protocols/cryptography/hasher";
 
 export class RegisterUser implements IRegisterUser {
-	private readonly encrypter: IEncrypter;
+	private readonly hasher: IHasher;
 	private readonly addUserRepository: IAddUserRepository;
 	private readonly addAccountRepository: IAddAccountRepository;
 	private readonly addAccountToUserRepository: IAddAccountToUserRepository;
 
 	constructor(
-		encrypter: IEncrypter,
+		hasher: IHasher,
 		addUserRepository: IAddUserRepository,
 		addAccountRepository: IAddAccountRepository,
 		addAccountToUserRepository: IAddAccountToUserRepository
 	) {
-		this.encrypter = encrypter;
+		this.hasher = hasher;
 		this.addUserRepository = addUserRepository;
 		this.addAccountRepository = addAccountRepository;
 		this.addAccountToUserRepository = addAccountToUserRepository;
@@ -26,7 +26,7 @@ export class RegisterUser implements IRegisterUser {
 
 	async execute(user: RegisterUserModel): Promise<UserModel> {
 		const { username, password } = user;
-		const hashedPassword = await this.encrypter.encrypt(password);
+		const hashedPassword = await this.hasher.hash(password);
 
 		const createdUser = await this.addUserRepository.add({
 			username: username,
