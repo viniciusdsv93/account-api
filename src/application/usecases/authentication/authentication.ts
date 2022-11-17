@@ -26,10 +26,12 @@ export class Authentication implements IAuthentication {
 		const user = await this.findByUsernameRepository.find(username);
 
 		if (user) {
-			await this.hashComparer.compare(password, user.password);
-			await this.tokenGenerator.generate(user.id);
+			const isValid = await this.hashComparer.compare(password, user.password);
+			if (isValid) {
+				const accessToken = await this.tokenGenerator.generate(user.id);
+				return accessToken;
+			}
 		}
-
 		return null;
 	}
 }
