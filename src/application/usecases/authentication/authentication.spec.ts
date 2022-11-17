@@ -1,4 +1,5 @@
 import { UserModel } from "../../../domain/models/user";
+import { IAuthentication } from "../../../domain/usecases/authentication";
 import { IFindByUsernameRepository } from "../../protocols/repositories/find-by-username-repository";
 import { Authentication } from "./authentication";
 
@@ -19,9 +20,22 @@ describe("Authentication UseCase", () => {
 		return new FindByUsernameRepositoryStub();
 	};
 
-	test("Should call FindUserByUsernameRepository with correct username", async () => {
+	type SutTypes = {
+		sut: IAuthentication;
+		findByUsername: IFindByUsernameRepository;
+	};
+
+	const makeSut = (): SutTypes => {
 		const findByUsername = makeFindByUsernameRepositoryStub();
 		const sut = new Authentication(findByUsername);
+		return {
+			sut,
+			findByUsername,
+		};
+	};
+
+	test("Should call FindUserByUsernameRepository with correct username", async () => {
+		const { sut, findByUsername } = makeSut();
 		const findByUsernameSpy = jest.spyOn(findByUsername, "find");
 		await sut.auth({
 			username: "any_username",
@@ -29,4 +43,15 @@ describe("Authentication UseCase", () => {
 		});
 		expect(findByUsernameSpy).toHaveBeenCalledWith("any_username");
 	});
+
+	// test("Should throw if FindUserByUsernameRepository throws", async () => {
+	// 	const findByUsername = makeFindByUsernameRepositoryStub();
+	// 	const sut = new Authentication(findByUsername);
+	// 	const findByUsernameSpy = jest.spyOn(findByUsername, "find");
+	// 	await sut.auth({
+	// 		username: "any_username",
+	// 		password: "any_password",
+	// 	});
+	// 	expect(findByUsernameSpy).toHaveBeenCalledWith("any_username");
+	// });
 });

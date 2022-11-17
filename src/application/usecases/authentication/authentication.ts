@@ -15,6 +15,6 @@ export class Authentication implements IAuthentication {
 		const { username, password } = authentication;
 		await this.findByUsernameRepository.find(username);
 
-		return new Promise((resolve) => resolve(null));
+		return null;
 	}
 }
