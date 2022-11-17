@@ -1,14 +1,16 @@
 import { IHasher } from "../../application/protocols/cryptography/hasher";
 import bcrypt from "bcrypt";
+import { IHashComparer } from "../../application/protocols/cryptography/hash-comparer";
 
-export class BcryptAdapter implements IHasher {
+export class BcryptAdapter implements IHasher, IHashComparer {
 	private readonly salt: number;
 
 	constructor(salt: number) {
 		this.salt = salt;
 	}
-	verify(password: string): Promise<boolean> {
-		throw new Error("Method not implemented.");
+
+	async compare(value: string, hash: string): Promise<boolean> {
+		return await bcrypt.compare(value, hash);
 	}
 
 	async hash(password: string): Promise<string> {
