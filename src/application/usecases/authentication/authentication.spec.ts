@@ -3,6 +3,7 @@ import { IAuthentication } from "../../../domain/usecases/authentication";
 import { IHashComparer } from "../../protocols/cryptography/hash-comparer";
 import { ITokenGenerator } from "../../protocols/cryptography/token-generator";
 import { IFindByUsernameRepository } from "../../protocols/repositories/find-by-username-repository";
+import { IUpdateAccessTokenRepository } from "../../protocols/repositories/update-access-token-repository";
 import { Authentication } from "./authentication";
 
 describe("Authentication UseCase", () => {
@@ -26,11 +27,20 @@ describe("Authentication UseCase", () => {
 
 	const makeTokenGeneratorStub = (): ITokenGenerator => {
 		class TokenGeneratorStub implements ITokenGenerator {
-			async generate(id: string): Promise<string | null> {
+			async generate(id: string): Promise<string> {
 				return new Promise((resolve) => resolve("any_token"));
 			}
 		}
 		return new TokenGeneratorStub();
+	};
+
+	const makeUpdateAccessTokenRepositoryStub = (): IUpdateAccessTokenRepository => {
+		class UpdateAccessTokenRepositoryStub implements IUpdateAccessTokenRepository {
+			async update(id: string, token: string): Promise<void> {
+				return new Promise((resolve) => resolve());
+			}
+		}
+		return new UpdateAccessTokenRepositoryStub();
 	};
 
 	const makeFakeUserData = () => {
@@ -54,22 +64,26 @@ describe("Authentication UseCase", () => {
 		findByUsernameStub: IFindByUsernameRepository;
 		hashComparerStub: IHashComparer;
 		tokenGeneratorStub: ITokenGenerator;
+		updateAccessTokenRepositoryStub: IUpdateAccessTokenRepository;
 	};
 
 	const makeSut = (): SutTypes => {
 		const findByUsernameStub = makeFindByUsernameRepositoryStub();
 		const hashComparerStub = makeHashComparerStub();
 		const tokenGeneratorStub = makeTokenGeneratorStub();
+		const updateAccessTokenRepositoryStub = makeUpdateAccessTokenRepositoryStub();
 		const sut = new Authentication(
 			findByUsernameStub,
 			hashComparerStub,
-			tokenGeneratorStub
+			tokenGeneratorStub,
+			updateAccessTokenRepositoryStub
 		);
 		return {
 			sut,
 			findByUsernameStub,
 			hashComparerStub,
 			tokenGeneratorStub,
+			updateAccessTokenRepositoryStub,
 		};
 	};
 
@@ -143,5 +157,12 @@ describe("Authentication UseCase", () => {
 		const { sut } = makeSut();
 		const accessToken = await sut.auth(makeFakeUserData());
 		expect(accessToken).toEqual("any_token");
+	});
+
+	test("Should call UpdateAccessTokenRepository with correct values", async () => {
+		const { sut, updateAccessTokenRepositoryStub } = makeSut();
+		const updateSpy = jest.spyOn(updateAccessTokenRepositoryStub, "update");
+		await sut.auth(makeFakeUserData());
+		expect(updateSpy).toBeCalledWith("valid_id", "any_token");
 	});
 });
