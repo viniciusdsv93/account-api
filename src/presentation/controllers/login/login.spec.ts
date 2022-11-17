@@ -1,6 +1,7 @@
 import { IEncrypter } from "../../../application/protocols/cryptography/encrypter";
 import { IFindByUsernameRepository } from "../../../application/protocols/repositories/find-by-username-repository";
 import { UserModel } from "../../../domain/models/user";
+import { IAuthentication } from "../../../domain/usecases/authentication";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { badRequest, unauthorized } from "../../helpers/http";
@@ -33,32 +34,29 @@ describe("Login Controller", () => {
 		return new FindByUsernameRepositoryStub();
 	};
 
-	const makeEncrypterStub = (): IEncrypter => {
-		class EncrypterStub implements IEncrypter {
-			encrypt(password: string): Promise<string> {
-				throw new Error("Method not implemented.");
-			}
-			async verify(password: string): Promise<boolean> {
-				return new Promise((resolve) => resolve(true));
+	const makeAuthenticationStub = (): IAuthentication => {
+		class AuthenticationStub implements IAuthentication {
+			async auth(username: string, password: string): Promise<string> {
+				return new Promise((resolve) => resolve("any_token"));
 			}
 		}
-		return new EncrypterStub();
+		return new AuthenticationStub();
 	};
 
 	type SutTypes = {
 		sut: LoginController;
 		findByUsernameRepositoryStub: IFindByUsernameRepository;
-		encrypterStub: IEncrypter;
+		authenticationStub: IAuthentication;
 	};
 
 	const makeSut = (): SutTypes => {
 		const findByUsernameRepositoryStub = makeFindByUsernameRepositoryStub();
-		const encrypterStub = makeEncrypterStub();
-		const sut = new LoginController(findByUsernameRepositoryStub, encrypterStub);
+		const authenticationStub = makeAuthenticationStub();
+		const sut = new LoginController(findByUsernameRepositoryStub, authenticationStub);
 		return {
 			sut,
 			findByUsernameRepositoryStub,
-			encrypterStub,
+			authenticationStub,
 		};
 	};
 
@@ -95,19 +93,10 @@ describe("Login Controller", () => {
 		);
 	});
 
-	test("Should call Encrypter with the correct password", async () => {
-		const { sut, encrypterStub } = makeSut();
-		const encrypterSpy = jest.spyOn(encrypterStub, "verify");
+	test("Should call Authentication with the correct values", async () => {
+		const { sut, authenticationStub } = makeSut();
+		const authSpy = jest.spyOn(authenticationStub, "auth");
 		await sut.handle(makeFakeRequest());
-		expect(encrypterSpy).toHaveBeenCalledWith("any_password");
-	});
-
-	test("Should return 401 if invalid password is provided", async () => {
-		const { sut, encrypterStub } = makeSut();
-		jest.spyOn(encrypterStub, "verify").mockReturnValueOnce(
-			new Promise((resolve) => resolve(false))
-		);
-		const httpResponse = await sut.handle(makeFakeRequest());
-		expect(httpResponse).toEqual(unauthorized());
+		expect(authSpy).toHaveBeenCalledWith("any_username", "any_password");
 	});
 });
