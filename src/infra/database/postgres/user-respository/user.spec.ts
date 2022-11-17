@@ -66,7 +66,7 @@ describe("User Prisma Repository", () => {
 		expect(findUserByUsername?.password).toEqual("Valid_password1");
 	});
 
-	test("Should return null if the username provided is not registered", async () => {
+	test("Should return null if findByUsername fails", async () => {
 		const { sut } = makeSut();
 		await sut.add(makeUserData());
 		const findUserByUsername = await sut.findByUsername("another_username");
