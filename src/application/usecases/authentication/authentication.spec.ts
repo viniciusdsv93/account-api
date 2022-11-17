@@ -44,14 +44,15 @@ describe("Authentication UseCase", () => {
 		expect(findByUsernameSpy).toHaveBeenCalledWith("any_username");
 	});
 
-	// test("Should throw if FindUserByUsernameRepository throws", async () => {
-	// 	const findByUsername = makeFindByUsernameRepositoryStub();
-	// 	const sut = new Authentication(findByUsername);
-	// 	const findByUsernameSpy = jest.spyOn(findByUsername, "find");
-	// 	await sut.auth({
-	// 		username: "any_username",
-	// 		password: "any_password",
-	// 	});
-	// 	expect(findByUsernameSpy).toHaveBeenCalledWith("any_username");
-	// });
+	test("Should throw if FindUserByUsernameRepository throws", async () => {
+		const { sut, findByUsername } = makeSut();
+		jest.spyOn(findByUsername, "find").mockReturnValueOnce(
+			new Promise((resolve, reject) => reject(new Error()))
+		);
+		const promise = sut.auth({
+			username: "any_username",
+			password: "any_password",
+		});
+		await expect(promise).rejects.toThrow();
+	});
 });
