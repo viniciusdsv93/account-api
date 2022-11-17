@@ -27,7 +27,7 @@ describe("User Prisma Repository", () => {
 		};
 	};
 
-	test("Should return an user on success", async () => {
+	test("Should return an user on add success", async () => {
 		const { sut } = makeSut();
 		const createdUser = await sut.add(makeUserData());
 		expect(createdUser).toHaveProperty("id");
@@ -57,11 +57,13 @@ describe("User Prisma Repository", () => {
 		expect(modifiedUser.accountId).toEqual(createdAccount.id);
 	});
 
-	test("Should find and return an user by the username", async () => {
+	test("Should return an user on findByUsername success", async () => {
 		const { sut } = makeSut();
 		const createdUser = await sut.add(makeUserData());
 		const findUserByUsername = await sut.findByUsername(createdUser.username);
-		expect(findUserByUsername).toBeTruthy();
+		expect(findUserByUsername?.id).toBeTruthy();
+		expect(findUserByUsername?.username).toEqual("valid_username");
+		expect(findUserByUsername?.password).toEqual("Valid_password1");
 	});
 
 	test("Should return null if the username provided is not registered", async () => {
