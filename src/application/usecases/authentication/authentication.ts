@@ -33,7 +33,10 @@ export class Authentication implements IAuthentication {
 			const isValid = await this.hashComparer.compare(password, user.password);
 			if (isValid) {
 				const accessToken = await this.encrypter.encrypt(user.id);
-				await this.updateAccessTokenRepository.update(user.id, accessToken);
+				await this.updateAccessTokenRepository.updateAccessToken(
+					user.id,
+					accessToken
+				);
 				return accessToken;
 			}
 		}
