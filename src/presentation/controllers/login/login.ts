@@ -37,7 +37,11 @@ export class LoginController implements Controller {
 			);
 		}
 
-		await this.authentication.auth(username, password);
+		const accessToken = await this.authentication.auth(username, password);
+
+		if (!accessToken) {
+			return unauthorized();
+		}
 
 		return ok("");
 	}
