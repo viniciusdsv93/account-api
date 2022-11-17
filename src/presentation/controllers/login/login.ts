@@ -3,7 +3,7 @@ import { IFindByUsernameRepository } from "../../../application/protocols/reposi
 import { IAuthentication } from "../../../domain/usecases/authentication";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
-import { badRequest, ok, unauthorized } from "../../helpers/http";
+import { badRequest, ok, serverError, unauthorized } from "../../helpers/http";
 import { Controller } from "../../protocols/controller";
 import { HttpRequest, HttpResponse } from "../../protocols/http";
 
@@ -20,29 +20,33 @@ export class LoginController implements Controller {
 	}
 
 	async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
-		const requiredFields = ["username", "password"];
-		for (const field of requiredFields) {
-			if (!httpRequest.body[field]) {
-				return badRequest(new MissingParamError(field));
+		try {
+			const requiredFields = ["username", "password"];
+			for (const field of requiredFields) {
+				if (!httpRequest.body[field]) {
+					return badRequest(new MissingParamError(field));
+				}
 			}
+
+			const { username, password } = httpRequest.body;
+
+			const findUser = await this.findByUsernameRepository.find(username);
+
+			if (!findUser) {
+				return badRequest(
+					new InvalidParamError("username", "invalid username or password")
+				);
+			}
+
+			const accessToken = await this.authentication.auth(username, password);
+
+			if (!accessToken) {
+				return unauthorized();
+			}
+
+			return ok("");
+		} catch (error) {
+			return serverError(error as Error);
 		}
-
-		const { username, password } = httpRequest.body;
-
-		const findUser = await this.findByUsernameRepository.find(username);
-
-		if (!findUser) {
-			return badRequest(
-				new InvalidParamError("username", "invalid username or password")
-			);
-		}
-
-		const accessToken = await this.authentication.auth(username, password);
-
-		if (!accessToken) {
-			return unauthorized();
-		}
-
-		return ok("");
 	}
 }
