@@ -1,6 +1,7 @@
 import { UserModel } from "../../../domain/models/user";
 import { IAuthentication } from "../../../domain/usecases/authentication";
 import { IHashComparer } from "../../protocols/cryptography/hash-comparer";
+import { ITokenGenerator } from "../../protocols/cryptography/token-generator";
 import { IFindByUsernameRepository } from "../../protocols/repositories/find-by-username-repository";
 import { Authentication } from "./authentication";
 
@@ -23,6 +24,15 @@ describe("Authentication UseCase", () => {
 		return new HashComparerStub();
 	};
 
+	const makeTokenGeneratorStub = (): ITokenGenerator => {
+		class TokenGeneratorStub implements ITokenGenerator {
+			async generate(id: string): Promise<string | null> {
+				return new Promise((resolve) => resolve("any_token"));
+			}
+		}
+		return new TokenGeneratorStub();
+	};
+
 	const makeFakeUserData = () => {
 		return {
 			username: "any_username",
@@ -43,16 +53,23 @@ describe("Authentication UseCase", () => {
 		sut: IAuthentication;
 		findByUsernameStub: IFindByUsernameRepository;
 		hashComparerStub: IHashComparer;
+		tokenGeneratorStub: ITokenGenerator;
 	};
 
 	const makeSut = (): SutTypes => {
 		const findByUsernameStub = makeFindByUsernameRepositoryStub();
 		const hashComparerStub = makeHashComparerStub();
-		const sut = new Authentication(findByUsernameStub, hashComparerStub);
+		const tokenGeneratorStub = makeTokenGeneratorStub();
+		const sut = new Authentication(
+			findByUsernameStub,
+			hashComparerStub,
+			tokenGeneratorStub
+		);
 		return {
 			sut,
 			findByUsernameStub,
 			hashComparerStub,
+			tokenGeneratorStub,
 		};
 	};
 
@@ -104,5 +121,12 @@ describe("Authentication UseCase", () => {
 		);
 		const accessToken = await sut.auth(makeFakeUserData());
 		expect(accessToken).toBeNull();
+	});
+
+	test("Should call TokenGenerator with correct id", async () => {
+		const { sut, tokenGeneratorStub } = makeSut();
+		const tokenGeneratorSpy = jest.spyOn(tokenGeneratorStub, "generate");
+		await sut.auth(makeFakeUserData());
+		expect(tokenGeneratorSpy).toBeCalledWith("valid_id");
 	});
 });
