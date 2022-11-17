@@ -3,18 +3,22 @@ import {
 	IAuthentication,
 } from "../../../domain/usecases/authentication";
 import { IHashComparer } from "../../protocols/cryptography/hash-comparer";
+import { ITokenGenerator } from "../../protocols/cryptography/token-generator";
 import { IFindByUsernameRepository } from "../../protocols/repositories/find-by-username-repository";
 
 export class Authentication implements IAuthentication {
 	private readonly findByUsernameRepository: IFindByUsernameRepository;
 	private readonly hashComparer: IHashComparer;
+	private readonly tokenGenerator: ITokenGenerator;
 
 	constructor(
 		findByUsernameRepository: IFindByUsernameRepository,
-		hashComparer: IHashComparer
+		hashComparer: IHashComparer,
+		tokenGenerator: ITokenGenerator
 	) {
 		this.findByUsernameRepository = findByUsernameRepository;
 		this.hashComparer = hashComparer;
+		this.tokenGenerator = tokenGenerator;
 	}
 
 	async auth(authentication: AuthenticationModel): Promise<string | null> {
@@ -23,6 +27,7 @@ export class Authentication implements IAuthentication {
 
 		if (user) {
 			await this.hashComparer.compare(password, user.password);
+			await this.tokenGenerator.generate(user.id);
 		}
 
 		return null;
