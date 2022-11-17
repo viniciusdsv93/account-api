@@ -1,7 +1,10 @@
 import { IEncrypter } from "../../../application/protocols/cryptography/encrypter";
 import { IFindByUsernameRepository } from "../../../application/protocols/repositories/find-by-username-repository";
 import { UserModel } from "../../../domain/models/user";
-import { IAuthentication } from "../../../domain/usecases/authentication";
+import {
+	AuthenticationModel,
+	IAuthentication,
+} from "../../../domain/usecases/authentication";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { badRequest, ok, serverError, unauthorized } from "../../helpers/http";
@@ -36,7 +39,7 @@ describe("Login Controller", () => {
 
 	const makeAuthenticationStub = (): IAuthentication => {
 		class AuthenticationStub implements IAuthentication {
-			async auth(username: string, password: string): Promise<string> {
+			async auth(authentication: AuthenticationModel): Promise<string | null> {
 				return new Promise((resolve) => resolve("any_token"));
 			}
 		}
@@ -97,7 +100,10 @@ describe("Login Controller", () => {
 		const { sut, authenticationStub } = makeSut();
 		const authSpy = jest.spyOn(authenticationStub, "auth");
 		await sut.handle(makeFakeRequest());
-		expect(authSpy).toHaveBeenCalledWith("any_username", "any_password");
+		expect(authSpy).toHaveBeenCalledWith({
+			username: "any_username",
+			password: "any_password",
+		});
 	});
 
 	test("Should return 401 if invalid credentials are provided", async () => {
