@@ -20,6 +20,13 @@ describe("Authentication UseCase", () => {
 		return new FindByUsernameRepositoryStub();
 	};
 
+	const makeFakeUserData = () => {
+		return {
+			username: "any_username",
+			password: "any_password",
+		};
+	};
+
 	type SutTypes = {
 		sut: IAuthentication;
 		findByUsername: IFindByUsernameRepository;
@@ -37,10 +44,7 @@ describe("Authentication UseCase", () => {
 	test("Should call FindUserByUsernameRepository with correct username", async () => {
 		const { sut, findByUsername } = makeSut();
 		const findByUsernameSpy = jest.spyOn(findByUsername, "find");
-		await sut.auth({
-			username: "any_username",
-			password: "any_password",
-		});
+		await sut.auth(makeFakeUserData());
 		expect(findByUsernameSpy).toHaveBeenCalledWith("any_username");
 	});
 
@@ -49,10 +53,7 @@ describe("Authentication UseCase", () => {
 		jest.spyOn(findByUsername, "find").mockReturnValueOnce(
 			new Promise((resolve, reject) => reject(new Error()))
 		);
-		const promise = sut.auth({
-			username: "any_username",
-			password: "any_password",
-		});
+		const promise = sut.auth(makeFakeUserData());
 		await expect(promise).rejects.toThrow();
 	});
 });
