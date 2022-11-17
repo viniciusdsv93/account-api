@@ -27,7 +27,7 @@ export class Authentication implements IAuthentication {
 
 	async auth(authentication: AuthenticationModel): Promise<string | null> {
 		const { username, password } = authentication;
-		const user = await this.findByUsernameRepository.find(username);
+		const user = await this.findByUsernameRepository.findByUsername(username);
 
 		if (user) {
 			const isValid = await this.hashComparer.compare(password, user.password);

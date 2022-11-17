@@ -9,7 +9,7 @@ import { Authentication } from "./authentication";
 describe("Authentication UseCase", () => {
 	const makeFindByUsernameRepositoryStub = (): IFindByUsernameRepository => {
 		class FindByUsernameRepositoryStub implements IFindByUsernameRepository {
-			async find(username: string): Promise<UserModel> {
+			async findByUsername(username: string): Promise<UserModel> {
 				return new Promise((resolve) => resolve(makeFakeUserResult()));
 			}
 		}
@@ -89,14 +89,14 @@ describe("Authentication UseCase", () => {
 
 	test("Should call FindUserByUsernameRepository with correct username", async () => {
 		const { sut, findByUsernameStub } = makeSut();
-		const findByUsernameSpyStub = jest.spyOn(findByUsernameStub, "find");
+		const findByUsernameSpyStub = jest.spyOn(findByUsernameStub, "findByUsername");
 		await sut.auth(makeFakeUserData());
 		expect(findByUsernameSpyStub).toHaveBeenCalledWith("any_username");
 	});
 
 	test("Should throw if FindUserByUsernameRepository throws", async () => {
 		const { sut, findByUsernameStub } = makeSut();
-		jest.spyOn(findByUsernameStub, "find").mockReturnValueOnce(
+		jest.spyOn(findByUsernameStub, "findByUsername").mockReturnValueOnce(
 			new Promise((resolve, reject) => reject(new Error()))
 		);
 		const promise = sut.auth(makeFakeUserData());
@@ -105,7 +105,7 @@ describe("Authentication UseCase", () => {
 
 	test("Should return null if FindUserByUsernameRepository returns null", async () => {
 		const { sut, findByUsernameStub } = makeSut();
-		jest.spyOn(findByUsernameStub, "find").mockReturnValueOnce(
+		jest.spyOn(findByUsernameStub, "findByUsername").mockReturnValueOnce(
 			new Promise((resolve) => resolve(null))
 		);
 		const accessToken = await sut.auth(makeFakeUserData());

@@ -16,7 +16,7 @@ export class UserPrismaRepository
 		IAddAccountToUserRepository,
 		IFindByUsernameRepository
 {
-	async find(username: string): Promise<UserModel | null> {
+	async findByUsername(username: string): Promise<UserModel | null> {
 		const findUserByUsername = await prismaClient.user.findFirst({
 			where: {
 				username: username,

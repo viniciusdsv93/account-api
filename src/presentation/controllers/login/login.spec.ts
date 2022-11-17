@@ -22,7 +22,7 @@ describe("Login Controller", () => {
 
 	const makeFindByUsernameRepositoryStub = (): IFindByUsernameRepository => {
 		class FindByUsernameRepositoryStub implements IFindByUsernameRepository {
-			async find(username: string): Promise<UserModel> {
+			async findByUsername(username: string): Promise<UserModel> {
 				return new Promise((resolve) =>
 					resolve({
 						id: "valid_id",
@@ -86,7 +86,7 @@ describe("Login Controller", () => {
 
 	test("Should return 400 if the username provided is not registered", async () => {
 		const { sut, findByUsernameRepositoryStub } = makeSut();
-		jest.spyOn(findByUsernameRepositoryStub, "find").mockReturnValueOnce(
+		jest.spyOn(findByUsernameRepositoryStub, "findByUsername").mockReturnValueOnce(
 			new Promise((resolve) => resolve(null))
 		);
 		const httpResponse = await sut.handle(makeFakeRequest());

@@ -29,7 +29,7 @@ export class LoginController implements Controller {
 
 			const { username, password } = httpRequest.body;
 
-			const findUser = await this.findByUsernameRepository.find(username);
+			const findUser = await this.findByUsernameRepository.findByUsername(username);
 
 			if (!findUser) {
 				return badRequest(
