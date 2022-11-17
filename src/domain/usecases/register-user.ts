@@ -9,6 +9,7 @@ export type UserModelWithoutAccountId = {
 	id: string;
 	username: string;
 	password: string;
+	accessToken?: string | null;
 };
 
 export interface IRegisterUser {

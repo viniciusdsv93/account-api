@@ -3,5 +3,5 @@ export type UserModel = {
 	username: string;
 	password: string;
 	accountId: string;
-	accessToken?: string;
+	accessToken?: string | null;
 };
