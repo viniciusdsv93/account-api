@@ -72,4 +72,14 @@ describe("User Prisma Repository", () => {
 		const findUserByUsername = await sut.findByUsername("another_username");
 		expect(findUserByUsername).toBeNull();
 	});
+
+	test("Should update accessToken on updateAccessToken success", async () => {
+		const { sut } = makeSut();
+		const createdUser = await sut.add(makeUserData());
+		expect(createdUser.accessToken).toBeFalsy();
+		await sut.updateAccessToken(createdUser.id, "any_token");
+		const updatedUser = await sut.findByUsername(createdUser.username);
+		expect(updatedUser).toBeTruthy();
+		expect(updatedUser?.accessToken).toBe("any_token");
+	});
 });
