@@ -1,4 +1,4 @@
-import { IFindByUsernameRepository } from "../../../application/protocols/repositories/find-by-username-repository";
+import { IFindUserByUsernameRepository } from "../../../application/protocols/repositories/find-user-by-username-repository";
 import { IAuthentication } from "../../../domain/usecases/authentication";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
@@ -7,11 +7,11 @@ import { Controller } from "../../protocols/controller";
 import { HttpRequest, HttpResponse } from "../../protocols/http";
 
 export class LoginController implements Controller {
-	private readonly findByUsernameRepository: IFindByUsernameRepository;
+	private readonly findByUsernameRepository: IFindUserByUsernameRepository;
 	private readonly authentication: IAuthentication;
 
 	constructor(
-		findByUsernameRepository: IFindByUsernameRepository,
+		findByUsernameRepository: IFindUserByUsernameRepository,
 		authentication: IAuthentication
 	) {
 		this.findByUsernameRepository = findByUsernameRepository;

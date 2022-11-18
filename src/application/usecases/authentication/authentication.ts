@@ -4,17 +4,17 @@ import {
 } from "../../../domain/usecases/authentication";
 import { IHashComparer } from "../../protocols/cryptography/hash-comparer";
 import { IEncrypter } from "../../protocols/cryptography/encrypter";
-import { IFindByUsernameRepository } from "../../protocols/repositories/find-by-username-repository";
+import { IFindUserByUsernameRepository } from "../../protocols/repositories/find-user-by-username-repository";
 import { IUpdateAccessTokenRepository } from "../../protocols/repositories/update-access-token-repository";
 
 export class Authentication implements IAuthentication {
-	private readonly findByUsernameRepository: IFindByUsernameRepository;
+	private readonly findByUsernameRepository: IFindUserByUsernameRepository;
 	private readonly hashComparer: IHashComparer;
 	private readonly encrypter: IEncrypter;
 	private readonly updateAccessTokenRepository: IUpdateAccessTokenRepository;
 
 	constructor(
-		findByUsernameRepository: IFindByUsernameRepository,
+		findByUsernameRepository: IFindUserByUsernameRepository,
 		hashComparer: IHashComparer,
 		encrypter: IEncrypter,
 		updateAccessTokenRepository: IUpdateAccessTokenRepository

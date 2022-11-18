@@ -2,13 +2,13 @@ import { UserModel } from "../../../domain/models/user";
 import { IAuthentication } from "../../../domain/usecases/authentication";
 import { IHashComparer } from "../../protocols/cryptography/hash-comparer";
 import { IEncrypter } from "../../protocols/cryptography/encrypter";
-import { IFindByUsernameRepository } from "../../protocols/repositories/find-by-username-repository";
+import { IFindUserByUsernameRepository } from "../../protocols/repositories/find-user-by-username-repository";
 import { IUpdateAccessTokenRepository } from "../../protocols/repositories/update-access-token-repository";
 import { Authentication } from "./authentication";
 
 describe("Authentication UseCase", () => {
-	const makeFindByUsernameRepositoryStub = (): IFindByUsernameRepository => {
-		class FindByUsernameRepositoryStub implements IFindByUsernameRepository {
+	const makeFindByUsernameRepositoryStub = (): IFindUserByUsernameRepository => {
+		class FindByUsernameRepositoryStub implements IFindUserByUsernameRepository {
 			async findByUsername(username: string): Promise<UserModel> {
 				return new Promise((resolve) => resolve(makeFakeUserResult()));
 			}
@@ -61,7 +61,7 @@ describe("Authentication UseCase", () => {
 
 	type SutTypes = {
 		sut: IAuthentication;
-		findByUsernameStub: IFindByUsernameRepository;
+		findByUsernameStub: IFindUserByUsernameRepository;
 		hashComparerStub: IHashComparer;
 		encrypterStub: IEncrypter;
 		updateAccessTokenRepositoryStub: IUpdateAccessTokenRepository;

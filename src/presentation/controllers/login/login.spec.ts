@@ -1,4 +1,4 @@
-import { IFindByUsernameRepository } from "../../../application/protocols/repositories/find-by-username-repository";
+import { IFindUserByUsernameRepository } from "../../../application/protocols/repositories/find-user-by-username-repository";
 import { UserModel } from "../../../domain/models/user";
 import {
 	AuthenticationModel,
@@ -20,8 +20,8 @@ describe("Login Controller", () => {
 		};
 	};
 
-	const makeFindByUsernameRepositoryStub = (): IFindByUsernameRepository => {
-		class FindByUsernameRepositoryStub implements IFindByUsernameRepository {
+	const makeFindByUsernameRepositoryStub = (): IFindUserByUsernameRepository => {
+		class FindByUsernameRepositoryStub implements IFindUserByUsernameRepository {
 			async findByUsername(username: string): Promise<UserModel> {
 				return new Promise((resolve) =>
 					resolve({
@@ -47,7 +47,7 @@ describe("Login Controller", () => {
 
 	type SutTypes = {
 		sut: LoginController;
-		findByUsernameRepositoryStub: IFindByUsernameRepository;
+		findByUsernameRepositoryStub: IFindUserByUsernameRepository;
 		authenticationStub: IAuthentication;
 	};
 

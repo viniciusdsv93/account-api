@@ -21,14 +21,21 @@ export class CreateTransaction implements ICreateTransaction {
 	async execute(
 		transactionData: CreateTransactionModel
 	): Promise<TransactionModel | null> {
+		let debitedAccount = null;
+		let creditedAccount = null;
+
 		const { token, creditedUsername, value } = transactionData;
 
 		const payload = await this.decrypter.decrypt(token);
 
 		if (payload) {
 			const { id } = payload;
-			await this.findAccountByUserIdRepository.findByUserId(id);
+			debitedAccount = await this.findAccountByUserIdRepository.findByUserId(id);
 		}
+
+		// if (debitedAccount) {
+
+		// }
 
 		return null;
 	}
