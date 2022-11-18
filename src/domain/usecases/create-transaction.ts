@@ -1,6 +1,7 @@
 import { TransactionModel } from "../models/transaction";
 
 export type CreateTransactionModel = {
+	token: string;
 	creditedUsername: string;
 	value: number;
 };
