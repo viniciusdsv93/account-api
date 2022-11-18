@@ -15,7 +15,7 @@ export class GetAccountBalanceController implements Controller {
 			return badRequest(new MissingParamError("token"));
 		}
 		const token = httpRequest.headers.authorization.split(" ")[1];
-		await this.getAccountBalance.execute(token);
-		return ok("");
+		const balanceValue = await this.getAccountBalance.execute(token);
+		return ok({ value: balanceValue });
 	}
 }
