@@ -1,5 +1,5 @@
 import { MissingParamError } from "../../errors/missing-param-error";
-import { badRequest, ok } from "../../helpers/http";
+import { badRequest, ok, unauthorized } from "../../helpers/http";
 import { Controller } from "../../protocols/controller";
 import { HttpRequest, HttpResponse } from "../../protocols/http";
 
@@ -10,6 +10,10 @@ export class CreateTransactionController implements Controller {
 			if (!httpRequest.body[field]) {
 				return badRequest(new MissingParamError(field));
 			}
+		}
+
+		if (!httpRequest.headers.authorization) {
+			return unauthorized();
 		}
 
 		return new Promise((resolve) => resolve(ok("")));
