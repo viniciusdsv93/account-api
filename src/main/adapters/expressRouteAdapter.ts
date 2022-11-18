@@ -5,6 +5,7 @@ import { HttpRequest, HttpResponse } from "../../presentation/protocols/http";
 export const expressAdaptRoute = (controller: Controller) => {
 	return async (req: Request, res: Response) => {
 		const httpRequest: HttpRequest = {
+			headers: req.headers,
 			body: req.body,
 		};
 		const httpResponse: HttpResponse = await controller.handle(httpRequest);
