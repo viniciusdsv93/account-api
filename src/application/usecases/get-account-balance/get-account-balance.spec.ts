@@ -1,5 +1,7 @@
+import { AccountModel } from "../../../domain/models/account";
 import { IGetAccountBalance } from "../../../domain/usecases/get-account-balance";
 import { IDecrypter } from "../../protocols/cryptography/decrypter";
+import { IFindAccountByUserIdRepository } from "../../protocols/repositories/find-account-by-user-id-repository";
 import { GetAccountBalance } from "./get-account-balance";
 
 describe("Get Account Balance UseCase", () => {
@@ -12,17 +14,41 @@ describe("Get Account Balance UseCase", () => {
 		return new DecrypterStub();
 	};
 
+	const makeFindAccountByUserIdRepositoryStub = (): IFindAccountByUserIdRepository => {
+		class FindAccountByUserIdRepositoryStub
+			implements IFindAccountByUserIdRepository
+		{
+			async findByUserId(userId: string): Promise<AccountModel | null> {
+				return new Promise((resolve) => resolve(makeFakeAccount()));
+			}
+		}
+		return new FindAccountByUserIdRepositoryStub();
+	};
+
+	const makeFakeAccount = (): AccountModel => {
+		return {
+			id: "valid_account_id",
+			balance: 99.5,
+		};
+	};
+
 	type SutTypes = {
 		sut: IGetAccountBalance;
 		decrypterStub: IDecrypter;
+		findAccountByUserIdRepositoryStub: IFindAccountByUserIdRepository;
 	};
 
 	const makeSut = (): SutTypes => {
 		const decrypterStub = makeDecrypterStub();
-		const sut = new GetAccountBalance(decrypterStub);
+		const findAccountByUserIdRepositoryStub = makeFindAccountByUserIdRepositoryStub();
+		const sut = new GetAccountBalance(
+			decrypterStub,
+			findAccountByUserIdRepositoryStub
+		);
 		return {
 			sut,
 			decrypterStub,
+			findAccountByUserIdRepositoryStub,
 		};
 	};
 
@@ -55,5 +81,15 @@ describe("Get Account Balance UseCase", () => {
 		const { decrypterStub } = makeSut();
 		const decrypterResponse = await decrypterStub.decrypt("valid_token");
 		expect(decrypterResponse).toHaveProperty("id", "valid_id");
+	});
+
+	test("Should call FindAccountByUserIdRepository with the correct user id", async () => {
+		const { sut, findAccountByUserIdRepositoryStub } = makeSut();
+		const findAccountSpy = jest.spyOn(
+			findAccountByUserIdRepositoryStub,
+			"findByUserId"
+		);
+		await sut.execute("valid_token");
+		expect(findAccountSpy).toHaveBeenCalledWith("valid_id");
 	});
 });
