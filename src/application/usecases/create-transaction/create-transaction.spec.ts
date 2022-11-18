@@ -145,4 +145,12 @@ describe("Create Transaction UseCase", () => {
 		});
 		expect(response).toBeNull();
 	});
+
+	test("Should return an account on FindAccountByUserIdRepository success", async () => {
+		const { findAccountByUserIdRepositoryStub } = makeSut();
+		const findAccountRepositoryResponse =
+			await findAccountByUserIdRepositoryStub.findByUserId("valid_id");
+		expect(findAccountRepositoryResponse).toHaveProperty("id");
+		expect(findAccountRepositoryResponse).toHaveProperty("balance");
+	});
 });
