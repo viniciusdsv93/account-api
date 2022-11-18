@@ -1,4 +1,5 @@
 export type HttpRequest = {
+	headers?: any;
 	body?: any;
 };
 
