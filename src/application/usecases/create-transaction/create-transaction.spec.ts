@@ -189,4 +189,14 @@ describe("Create Transaction UseCase", () => {
 		const response = await sut.execute(makeFakeTransaction());
 		expect(response).toBeNull();
 	});
+
+	test("Should return an user on FindUserByUsernameRepository success", async () => {
+		const { findUserByUsernameRepositoryStub } = makeSut();
+		const findUserRepositoryResponse =
+			await findUserByUsernameRepositoryStub.findByUsername("valid_username");
+		expect(findUserRepositoryResponse).toHaveProperty("id");
+		expect(findUserRepositoryResponse).toHaveProperty("username");
+		expect(findUserRepositoryResponse).toHaveProperty("password");
+		expect(findUserRepositoryResponse).toHaveProperty("accountId");
+	});
 });
