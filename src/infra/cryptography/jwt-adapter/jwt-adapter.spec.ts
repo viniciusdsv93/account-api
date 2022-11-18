@@ -1,10 +1,13 @@
-import jwt from "jsonwebtoken";
+import jwt, { verify } from "jsonwebtoken";
 import { JwtAdapter } from "./jwt-adapter";
 
 jest.mock("jsonwebtoken", () => {
 	return {
 		async sign(): Promise<string> {
 			return new Promise((resolve) => resolve("any_token"));
+		},
+		async verify(): Promise<string> {
+			return new Promise((resolve) => resolve("valid_payload"));
 		},
 	};
 });
@@ -23,12 +26,6 @@ describe("JWT Adapter", () => {
 		});
 	});
 
-	test("Should return a token on sign success", async () => {
-		const sut = makeSut();
-		const accessToken = await sut.encrypt("any_id");
-		expect(accessToken).toBe("any_token");
-	});
-
 	test("Should throw if sign throws", async () => {
 		const sut = makeSut();
 		jest.spyOn(jwt, "sign").mockImplementationOnce(() => {
@@ -36,5 +33,18 @@ describe("JWT Adapter", () => {
 		});
 		const promise = sut.encrypt("any_id");
 		await expect(promise).rejects.toThrow();
+	});
+
+	test("Should return a token on sign success", async () => {
+		const sut = makeSut();
+		const accessToken = await sut.encrypt("any_id");
+		expect(accessToken).toBe("any_token");
+	});
+
+	test("Should call verify with correct token", async () => {
+		const sut = makeSut();
+		const verifySpy = jest.spyOn(jwt, "verify");
+		await sut.decrypt("any_token");
+		expect(verifySpy).toHaveBeenCalledWith("any_token", "secret");
 	});
 });
