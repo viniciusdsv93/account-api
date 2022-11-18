@@ -26,10 +26,19 @@ describe("Get Account Balance UseCase", () => {
 		};
 	};
 
-	test("Should call decrypter with the correct token", async () => {
+	test("Should call Decrypter with the correct token", async () => {
 		const { sut, decrypterStub } = makeSut();
 		const decrypterSpy = jest.spyOn(decrypterStub, "decrypt");
 		await sut.execute("valid_token");
 		expect(decrypterSpy).toHaveBeenCalledWith("valid_token");
+	});
+
+	test("Should throw if Decrypter throws", async () => {
+		const { sut, decrypterStub } = makeSut();
+		jest.spyOn(decrypterStub, "decrypt").mockReturnValueOnce(
+			new Promise((resolve, reject) => reject(new Error()))
+		);
+		const promise = sut.execute("valid_token");
+		await expect(promise).rejects.toThrow();
 	});
 });
