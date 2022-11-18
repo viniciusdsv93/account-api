@@ -179,4 +179,14 @@ describe("Create Transaction UseCase", () => {
 		const promise = sut.execute(makeFakeTransaction());
 		await expect(promise).rejects.toThrow();
 	});
+
+	test("Should return null if FindUserByUsernameRepository returns null", async () => {
+		const { sut, findUserByUsernameRepositoryStub } = makeSut();
+		jest.spyOn(
+			findUserByUsernameRepositoryStub,
+			"findByUsername"
+		).mockReturnValueOnce(new Promise((resolve) => resolve(null)));
+		const response = await sut.execute(makeFakeTransaction());
+		expect(response).toBeNull();
+	});
 });
