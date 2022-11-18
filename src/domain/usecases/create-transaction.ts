@@ -7,5 +7,5 @@ export type CreateTransactionModel = {
 };
 
 export interface ICreateTransaction {
-	execute(transactionData: CreateTransactionModel): Promise<TransactionModel>;
+	execute(transactionData: CreateTransactionModel): Promise<TransactionModel | null>;
 }
