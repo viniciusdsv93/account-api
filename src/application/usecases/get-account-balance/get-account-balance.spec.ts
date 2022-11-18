@@ -50,4 +50,10 @@ describe("Get Account Balance UseCase", () => {
 		const payload = await sut.execute("valid_token");
 		expect(payload).toBeNull();
 	});
+
+	test("Should return an user id on Decrypter success", async () => {
+		const { decrypterStub } = makeSut();
+		const decrypterResponse = await decrypterStub.decrypt("valid_token");
+		expect(decrypterResponse).toHaveProperty("id", "valid_id");
+	});
 });
