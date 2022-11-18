@@ -14,13 +14,13 @@ export class GetAccountBalance implements IGetAccountBalance {
 		this.findAccountByUserIdRepository = findAccountByUserIdRepository;
 	}
 
-	async execute(token: string): Promise<number> {
+	async execute(token: string): Promise<number | null> {
 		const payload = await this.decrypter.decrypt(token);
 		if (payload) {
 			const { id } = payload;
 			await this.findAccountByUserIdRepository.findByUserId(id);
 		}
 
-		return payload;
+		return null;
 	}
 }
