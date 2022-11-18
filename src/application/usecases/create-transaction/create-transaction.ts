@@ -5,17 +5,21 @@ import {
 } from "../../../domain/usecases/create-transaction";
 import { IDecrypter } from "../../protocols/cryptography/decrypter";
 import { IFindAccountByUserIdRepository } from "../../protocols/repositories/find-account-by-user-id-repository";
+import { IFindUserByUsernameRepository } from "../../protocols/repositories/find-user-by-username-repository";
 
 export class CreateTransaction implements ICreateTransaction {
 	private readonly decrypter: IDecrypter;
 	private readonly findAccountByUserIdRepository: IFindAccountByUserIdRepository;
+	private readonly findUserByUsernameRepository: IFindUserByUsernameRepository;
 
 	constructor(
 		decrypter: IDecrypter,
-		findAccountByUserIdRepository: IFindAccountByUserIdRepository
+		findAccountByUserIdRepository: IFindAccountByUserIdRepository,
+		findUserByUsernameRepository: IFindUserByUsernameRepository
 	) {
 		this.decrypter = decrypter;
 		this.findAccountByUserIdRepository = findAccountByUserIdRepository;
+		this.findUserByUsernameRepository = findUserByUsernameRepository;
 	}
 
 	async execute(
@@ -33,9 +37,9 @@ export class CreateTransaction implements ICreateTransaction {
 			debitedAccount = await this.findAccountByUserIdRepository.findByUserId(id);
 		}
 
-		// if (debitedAccount) {
-
-		// }
+		if (debitedAccount) {
+			await this.findUserByUsernameRepository.findByUsername(creditedUsername);
+		}
 
 		return null;
 	}
