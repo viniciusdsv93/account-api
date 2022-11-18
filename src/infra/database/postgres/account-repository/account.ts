@@ -1,8 +1,11 @@
 import { IAddAccountRepository } from "../../../../application/protocols/repositories/add-account-repository";
+import { IFindAccountByUserIdRepository } from "../../../../application/protocols/repositories/find-account-by-user-id-repository";
 import { AccountModel } from "../../../../domain/models/account";
 import { prismaClient } from "../prisma/prisma-client";
 
-export class AccountPrismaRepository implements IAddAccountRepository {
+export class AccountPrismaRepository
+	implements IAddAccountRepository, IFindAccountByUserIdRepository
+{
 	async add(userId: string): Promise<AccountModel> {
 		return await prismaClient.account.create({
 			data: {
@@ -12,6 +15,14 @@ export class AccountPrismaRepository implements IAddAccountRepository {
 						id: userId,
 					},
 				},
+			},
+		});
+	}
+
+	async findByUserId(userId: string): Promise<AccountModel | null> {
+		return await prismaClient.account.findFirst({
+			where: {
+				userId: userId,
 			},
 		});
 	}
