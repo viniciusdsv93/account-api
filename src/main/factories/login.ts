@@ -9,7 +9,8 @@ export const makeLoginController = (): Controller => {
 	const userPrismaRepository = new UserPrismaRepository();
 	const salt = 12;
 	const bcryptAdapter = new BcryptAdapter(salt);
-	const jwtAdapter = new JwtAdapter("secret");
+	const secret = process.env.JWT_SECRET || "secret";
+	const jwtAdapter = new JwtAdapter(secret);
 	const authentication = new Authentication(
 		userPrismaRepository,
 		bcryptAdapter,
