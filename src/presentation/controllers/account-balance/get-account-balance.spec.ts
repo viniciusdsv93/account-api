@@ -67,6 +67,6 @@ describe("Get Account Balance Controller", () => {
 	test("Should return the balance value on GetAccountBalanceUsecase success", async () => {
 		const { sut } = makeSut();
 		const httpResponse = await sut.handle(makeFakeRequest());
-		expect(httpResponse).toEqual(ok({ value: 99.5 }));
+		expect(httpResponse).toEqual(ok({ balance: 99.5 }));
 	});
 });
