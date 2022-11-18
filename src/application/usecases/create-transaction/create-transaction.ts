@@ -38,8 +38,22 @@ export class CreateTransaction implements ICreateTransaction {
 		}
 
 		if (debitedAccount) {
-			await this.findUserByUsernameRepository.findByUsername(creditedUsername);
+			const creditedUser = await this.findUserByUsernameRepository.findByUsername(
+				creditedUsername
+			);
+
+			if (creditedUser) {
+				creditedAccount = await this.findAccountByUserIdRepository.findByUserId(
+					creditedUser.id
+				);
+			}
 		}
+
+		// if (debitedAccount && creditedAccount) {
+		//   if (value <= debitedAccount.balance) {
+
+		//   }
+		// }
 
 		return null;
 	}
