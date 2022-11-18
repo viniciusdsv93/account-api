@@ -1,7 +1,9 @@
 //TODO
 
+import { AccountModel } from "../../../domain/models/account";
 import { ICreateTransaction } from "../../../domain/usecases/create-transaction";
 import { IDecrypter } from "../../protocols/cryptography/decrypter";
+import { IFindAccountByUserIdRepository } from "../../protocols/repositories/find-account-by-user-id-repository";
 import { CreateTransaction } from "./create-transaction";
 
 //verify token
@@ -25,17 +27,39 @@ describe("Create Transaction UseCase", () => {
 		return new DecrypterStub();
 	};
 
+	const makeFindAccountByUserIdRepositoryStub = (): IFindAccountByUserIdRepository => {
+		class FindAccountByUserIdRepositoryStub
+			implements IFindAccountByUserIdRepository
+		{
+			async findByUserId(userId: string): Promise<AccountModel | null> {
+				return new Promise((resolve) =>
+					resolve({
+						id: "valid_account_id",
+						balance: 87.3,
+					})
+				);
+			}
+		}
+		return new FindAccountByUserIdRepositoryStub();
+	};
+
 	type SutTypes = {
 		sut: ICreateTransaction;
 		decrypterStub: IDecrypter;
+		findAccountByUserIdRepositoryStub: IFindAccountByUserIdRepository;
 	};
 
 	const makeSut = (): SutTypes => {
 		const decrypterStub = makeDecrypterStub();
-		const sut = new CreateTransaction(decrypterStub);
+		const findAccountByUserIdRepositoryStub = makeFindAccountByUserIdRepositoryStub();
+		const sut = new CreateTransaction(
+			decrypterStub,
+			findAccountByUserIdRepositoryStub
+		);
 		return {
 			sut,
 			decrypterStub,
+			findAccountByUserIdRepositoryStub,
 		};
 	};
 
@@ -80,5 +104,19 @@ describe("Create Transaction UseCase", () => {
 		const { decrypterStub } = makeSut();
 		const decrypterResponse = await decrypterStub.decrypt("valid_token");
 		expect(decrypterResponse).toHaveProperty("id", "valid_id");
+	});
+
+	test("Should call FindAccountByUserIdRepository with the correct user id", async () => {
+		const { sut, findAccountByUserIdRepositoryStub } = makeSut();
+		const findAccountSpy = jest.spyOn(
+			findAccountByUserIdRepositoryStub,
+			"findByUserId"
+		);
+		await sut.execute({
+			token: "valid_token",
+			creditedUsername: "valid_username",
+			value: 99,
+		});
+		expect(findAccountSpy).toHaveBeenCalledWith("valid_id");
 	});
 });
