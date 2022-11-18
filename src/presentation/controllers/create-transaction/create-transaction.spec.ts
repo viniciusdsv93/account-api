@@ -1,16 +1,42 @@
+import { TransactionModel } from "../../../domain/models/transaction";
+import {
+	CreateTransactionModel,
+	ICreateTransaction,
+} from "../../../domain/usecases/create-transaction";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { badRequest, unauthorized } from "../../helpers/http";
 import { CreateTransactionController } from "./create-transaction";
 
 describe("Create Transaction Controller", () => {
+	const makeCreateTransactionStub = (): ICreateTransaction => {
+		class CreateTransactionStub implements ICreateTransaction {
+			async execute(
+				transactionData: CreateTransactionModel
+			): Promise<TransactionModel> {
+				return new Promise((resolve) =>
+					resolve({
+						id: "valid_transaction_id",
+						debitedAccountId: "valid_debited_account_id",
+						creditedAccountId: "valid_credited_account_id",
+						value: 99,
+					})
+				);
+			}
+		}
+		return new CreateTransactionStub();
+	};
+
 	type SutTypes = {
 		sut: CreateTransactionController;
+		createTransactionStub: ICreateTransaction;
 	};
 
 	const makeSut = (): SutTypes => {
-		const sut = new CreateTransactionController();
+		const createTransactionStub = makeCreateTransactionStub();
+		const sut = new CreateTransactionController(createTransactionStub);
 		return {
 			sut,
+			createTransactionStub,
 		};
 	};
 
@@ -18,7 +44,6 @@ describe("Create Transaction Controller", () => {
 		const { sut } = makeSut();
 		const httpResponse = await sut.handle({
 			body: {
-				debitedUsername: "any_debited_username",
 				value: 99,
 			},
 			headers: {
@@ -35,7 +60,6 @@ describe("Create Transaction Controller", () => {
 		const httpResponse = await sut.handle({
 			body: {
 				creditedUsername: "any_credited_username",
-				debitedUsername: "any_debited_username",
 			},
 			headers: {
 				authorization: "Bearer any_token",
@@ -49,11 +73,29 @@ describe("Create Transaction Controller", () => {
 		const httpResponse = await sut.handle({
 			body: {
 				creditedUsername: "any_credited_username",
-				debitedUsername: "any_debited_username",
 				value: 99,
 			},
 			headers: {},
 		});
 		expect(httpResponse).toEqual(unauthorized());
+	});
+
+	test("Should call CreateTransactionUseCase with correct values", async () => {
+		const { sut, createTransactionStub } = makeSut();
+		const createTransactionSpy = jest.spyOn(createTransactionStub, "execute");
+		await sut.handle({
+			body: {
+				creditedUsername: "any_credited_username",
+				value: 99,
+			},
+			headers: {
+				authorization: "Bearer any_token",
+			},
+		});
+		expect(createTransactionSpy).toHaveBeenCalledWith({
+			token: "any_token",
+			creditedUsername: "any_credited_username",
+			value: 99,
+		});
 	});
 });
