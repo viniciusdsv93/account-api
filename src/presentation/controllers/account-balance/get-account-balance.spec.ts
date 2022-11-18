@@ -1,6 +1,6 @@
 import { IGetAccountBalance } from "../../../domain/usecases/get-account-balance";
 import { MissingParamError } from "../../errors/missing-param-error";
-import { badRequest, ok, serverError } from "../../helpers/http";
+import { badRequest, ok, serverError, unauthorized } from "../../helpers/http";
 import { HttpRequest } from "../../protocols/http";
 import { GetAccountBalanceController } from "./get-account-balance";
 
@@ -62,6 +62,15 @@ describe("Get Account Balance Controller", () => {
 		);
 		const httpResponse = await sut.handle(makeFakeRequest());
 		expect(httpResponse).toEqual(serverError(new Error()));
+	});
+
+	test("Should return 401 if invalid token is provided", async () => {
+		const { sut, getAccountBalanceStub } = makeSut();
+		jest.spyOn(getAccountBalanceStub, "execute").mockReturnValueOnce(
+			new Promise((resolve) => resolve(null))
+		);
+		const httpResponse = await sut.handle(makeFakeRequest());
+		expect(httpResponse).toEqual(unauthorized());
 	});
 
 	test("Should return the balance value on GetAccountBalanceUsecase success", async () => {
