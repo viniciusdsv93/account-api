@@ -3,8 +3,19 @@ import { badRequest } from "../../helpers/http";
 import { CreateTransactionController } from "./create-transaction";
 
 describe("Create Transaction Controller", () => {
-	test("Should return 400 if no debitedUsername is provided", async () => {
+	type SutTypes = {
+		sut: CreateTransactionController;
+	};
+
+	const makeSut = (): SutTypes => {
 		const sut = new CreateTransactionController();
+		return {
+			sut,
+		};
+	};
+
+	test("Should return 400 if no debitedUsername is provided", async () => {
+		const { sut } = makeSut();
 		const httpResponse = await sut.handle({
 			body: {
 				creditedUsername: "any_credited_username",
@@ -17,7 +28,7 @@ describe("Create Transaction Controller", () => {
 	});
 
 	test("Should return 400 if no creditedUsername is provided", async () => {
-		const sut = new CreateTransactionController();
+		const { sut } = makeSut();
 		const httpResponse = await sut.handle({
 			body: {
 				debitedUsername: "any_debited_username",
@@ -30,7 +41,7 @@ describe("Create Transaction Controller", () => {
 	});
 
 	test("Should return 400 if no value is provided", async () => {
-		const sut = new CreateTransactionController();
+		const { sut } = makeSut();
 		const httpResponse = await sut.handle({
 			body: {
 				creditedUsername: "any_credited_username",
