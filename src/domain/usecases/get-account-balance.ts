@@ -1,3 +1,3 @@
 export interface IGetAccountBalance {
-	execute(userId: string): Promise<number>;
+	execute(token: string): Promise<number>;
 }
