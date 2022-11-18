@@ -9,6 +9,7 @@ export class GetAccountBalance implements IGetAccountBalance {
 	}
 
 	async execute(token: string): Promise<number> {
-		return await this.decrypter.decrypt(token);
+		const payload = await this.decrypter.decrypt(token);
+		return payload;
 	}
 }
