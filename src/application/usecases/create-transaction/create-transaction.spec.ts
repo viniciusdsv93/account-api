@@ -169,4 +169,14 @@ describe("Create Transaction UseCase", () => {
 		await sut.execute(makeFakeTransaction());
 		expect(findUserSpy).toHaveBeenCalledWith("valid_username");
 	});
+
+	test("Should throw if FindUserByUsernameRepository throws", async () => {
+		const { sut, findUserByUsernameRepositoryStub } = makeSut();
+		jest.spyOn(
+			findUserByUsernameRepositoryStub,
+			"findByUsername"
+		).mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())));
+		const promise = sut.execute(makeFakeTransaction());
+		await expect(promise).rejects.toThrow();
+	});
 });
