@@ -17,6 +17,11 @@ export class GetAccountBalanceController implements Controller {
 			}
 			const token = httpRequest.headers.authorization.split(" ")[1];
 			const balanceValue = await this.getAccountBalance.execute(token);
+
+			if (!balanceValue) {
+				return unauthorized();
+			}
+
 			return ok({ balance: balanceValue });
 		} catch (error) {
 			return serverError(error as Error);
