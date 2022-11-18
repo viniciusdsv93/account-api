@@ -75,4 +75,10 @@ describe("Create Transaction UseCase", () => {
 		});
 		expect(payload).toBeNull();
 	});
+
+	test("Should return an user id on Decrypter success", async () => {
+		const { decrypterStub } = makeSut();
+		const decrypterResponse = await decrypterStub.decrypt("valid_token");
+		expect(decrypterResponse).toHaveProperty("id", "valid_id");
+	});
 });
