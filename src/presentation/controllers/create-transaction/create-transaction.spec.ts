@@ -5,6 +5,7 @@ import {
 } from "../../../domain/usecases/create-transaction";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { badRequest, serverError, unauthorized } from "../../helpers/http";
+import { HttpRequest } from "../../protocols/http";
 import { CreateTransactionController } from "./create-transaction";
 
 describe("Create Transaction Controller", () => {
@@ -24,6 +25,18 @@ describe("Create Transaction Controller", () => {
 			}
 		}
 		return new CreateTransactionStub();
+	};
+
+	const makeFakeRequest = (): HttpRequest => {
+		return {
+			body: {
+				creditedUsername: "any_credited_username",
+				value: 99,
+			},
+			headers: {
+				authorization: "Bearer any_token",
+			},
+		};
 	};
 
 	type SutTypes = {
@@ -83,15 +96,7 @@ describe("Create Transaction Controller", () => {
 	test("Should call CreateTransactionUseCase with correct values", async () => {
 		const { sut, createTransactionStub } = makeSut();
 		const createTransactionSpy = jest.spyOn(createTransactionStub, "execute");
-		await sut.handle({
-			body: {
-				creditedUsername: "any_credited_username",
-				value: 99,
-			},
-			headers: {
-				authorization: "Bearer any_token",
-			},
-		});
+		await sut.handle(makeFakeRequest());
 		expect(createTransactionSpy).toHaveBeenCalledWith({
 			token: "any_token",
 			creditedUsername: "any_credited_username",
@@ -104,15 +109,7 @@ describe("Create Transaction Controller", () => {
 		jest.spyOn(createTransactionStub, "execute").mockReturnValueOnce(
 			new Promise((resolve, reject) => reject(new Error()))
 		);
-		const httpResponse = await sut.handle({
-			body: {
-				creditedUsername: "any_credited_username",
-				value: 99,
-			},
-			headers: {
-				authorization: "Bearer any_token",
-			},
-		});
+		const httpResponse = await sut.handle(makeFakeRequest());
 		expect(httpResponse).toEqual(serverError(new Error()));
 	});
 });
