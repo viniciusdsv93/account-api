@@ -62,4 +62,17 @@ describe("Create Transaction UseCase", () => {
 		});
 		await expect(promise).rejects.toThrow();
 	});
+
+	test("Should return null if Decrypter returns null", async () => {
+		const { sut, decrypterStub } = makeSut();
+		jest.spyOn(decrypterStub, "decrypt").mockReturnValueOnce(
+			new Promise((resolve) => resolve(null))
+		);
+		const payload = await sut.execute({
+			token: "valid_token",
+			creditedUsername: "valid_username",
+			value: 99,
+		});
+		expect(payload).toBeNull();
+	});
 });
