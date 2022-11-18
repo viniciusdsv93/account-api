@@ -118,4 +118,10 @@ describe("Get Account Balance UseCase", () => {
 		expect(findAccountRepositoryResponse).toHaveProperty("id");
 		expect(findAccountRepositoryResponse).toHaveProperty("balance");
 	});
+
+	test("Should return an account's balance on success", async () => {
+		const { sut } = makeSut();
+		const response = await sut.execute("valid_token");
+		expect(response).toEqual(99.5);
+	});
 });
