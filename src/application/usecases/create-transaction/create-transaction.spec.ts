@@ -1,9 +1,11 @@
 //TODO
 
 import { AccountModel } from "../../../domain/models/account";
+import { UserModel } from "../../../domain/models/user";
 import { ICreateTransaction } from "../../../domain/usecases/create-transaction";
 import { IDecrypter } from "../../protocols/cryptography/decrypter";
 import { IFindAccountByUserIdRepository } from "../../protocols/repositories/find-account-by-user-id-repository";
+import { IFindUserByUsernameRepository } from "../../protocols/repositories/find-user-by-username-repository";
 import { CreateTransaction } from "./create-transaction";
 
 //verify token
@@ -43,23 +45,43 @@ describe("Create Transaction UseCase", () => {
 		return new FindAccountByUserIdRepositoryStub();
 	};
 
+	const makeFindUserByUsernameRepositoryStub = (): IFindUserByUsernameRepository => {
+		class FindUserByUsernameRepositoryStub implements IFindUserByUsernameRepository {
+			async findByUsername(username: string): Promise<UserModel | null> {
+				return new Promise((resolve) =>
+					resolve({
+						id: "user_id",
+						username: "username",
+						password: "hashed_password",
+						accountId: "accountId",
+					})
+				);
+			}
+		}
+		return new FindUserByUsernameRepositoryStub();
+	};
+
 	type SutTypes = {
 		sut: ICreateTransaction;
 		decrypterStub: IDecrypter;
 		findAccountByUserIdRepositoryStub: IFindAccountByUserIdRepository;
+		findUserByUsernameRepositoryStub: IFindUserByUsernameRepository;
 	};
 
 	const makeSut = (): SutTypes => {
 		const decrypterStub = makeDecrypterStub();
 		const findAccountByUserIdRepositoryStub = makeFindAccountByUserIdRepositoryStub();
+		const findUserByUsernameRepositoryStub = makeFindUserByUsernameRepositoryStub();
 		const sut = new CreateTransaction(
 			decrypterStub,
-			findAccountByUserIdRepositoryStub
+			findAccountByUserIdRepositoryStub,
+			findUserByUsernameRepositoryStub
 		);
 		return {
 			sut,
 			decrypterStub,
 			findAccountByUserIdRepositoryStub,
+			findUserByUsernameRepositoryStub,
 		};
 	};
 
@@ -152,5 +174,19 @@ describe("Create Transaction UseCase", () => {
 			await findAccountByUserIdRepositoryStub.findByUserId("valid_id");
 		expect(findAccountRepositoryResponse).toHaveProperty("id");
 		expect(findAccountRepositoryResponse).toHaveProperty("balance");
+	});
+
+	test("Should call FindUserByUsernameRepository with the correct username", async () => {
+		const { sut, findUserByUsernameRepositoryStub } = makeSut();
+		const findUserSpy = jest.spyOn(
+			findUserByUsernameRepositoryStub,
+			"findByUsername"
+		);
+		await sut.execute({
+			token: "valid_token",
+			creditedUsername: "valid_username",
+			value: 99,
+		});
+		expect(findUserSpy).toHaveBeenCalledWith("valid_username");
 	});
 });
