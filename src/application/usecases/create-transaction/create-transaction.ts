@@ -4,12 +4,18 @@ import {
 	ICreateTransaction,
 } from "../../../domain/usecases/create-transaction";
 import { IDecrypter } from "../../protocols/cryptography/decrypter";
+import { IFindAccountByUserIdRepository } from "../../protocols/repositories/find-account-by-user-id-repository";
 
 export class CreateTransaction implements ICreateTransaction {
 	private readonly decrypter: IDecrypter;
+	private readonly findAccountByUserIdRepository: IFindAccountByUserIdRepository;
 
-	constructor(decrypter: IDecrypter) {
+	constructor(
+		decrypter: IDecrypter,
+		findAccountByUserIdRepository: IFindAccountByUserIdRepository
+	) {
 		this.decrypter = decrypter;
+		this.findAccountByUserIdRepository = findAccountByUserIdRepository;
 	}
 
 	async execute(
@@ -17,7 +23,12 @@ export class CreateTransaction implements ICreateTransaction {
 	): Promise<TransactionModel | null> {
 		const { token, creditedUsername, value } = transactionData;
 
-		await this.decrypter.decrypt(token);
+		const payload = await this.decrypter.decrypt(token);
+
+		if (payload) {
+			const { id } = payload;
+			await this.findAccountByUserIdRepository.findByUserId(id);
+		}
 
 		return null;
 	}
