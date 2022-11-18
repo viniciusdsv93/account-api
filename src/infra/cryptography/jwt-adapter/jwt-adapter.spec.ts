@@ -56,4 +56,10 @@ describe("JWT Adapter", () => {
 		const promise = sut.decrypt("any_token");
 		await expect(promise).rejects.toThrow();
 	});
+
+	test("Should return a payload on verify success", async () => {
+		const sut = makeSut();
+		const payload = await sut.decrypt("any_token");
+		expect(payload).toEqual("valid_payload");
+	});
 });
