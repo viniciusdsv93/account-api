@@ -48,13 +48,13 @@ describe("JWT Adapter", () => {
 		expect(verifySpy).toHaveBeenCalledWith("any_token", "secret");
 	});
 
-	test("Should throw if verify throws", async () => {
+	test("Should return null if verify throws", async () => {
 		const sut = makeSut();
 		jest.spyOn(jwt, "verify").mockImplementationOnce(() => {
 			throw new Error();
 		});
-		const promise = sut.decrypt("any_token");
-		await expect(promise).rejects.toThrow();
+		const payload = await sut.decrypt("any_token");
+		expect(payload).toBeNull();
 	});
 
 	test("Should return a payload on verify success", async () => {
