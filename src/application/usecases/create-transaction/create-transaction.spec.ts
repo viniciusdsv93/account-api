@@ -119,4 +119,17 @@ describe("Create Transaction UseCase", () => {
 		});
 		expect(findAccountSpy).toHaveBeenCalledWith("valid_id");
 	});
+
+	test("Should throw if FindAccountByUserIdRepository throws", async () => {
+		const { sut, findAccountByUserIdRepositoryStub } = makeSut();
+		jest.spyOn(findAccountByUserIdRepositoryStub, "findByUserId").mockReturnValueOnce(
+			new Promise((resolve, reject) => reject(new Error()))
+		);
+		const promise = sut.execute({
+			token: "valid_token",
+			creditedUsername: "valid_username",
+			value: 99,
+		});
+		await expect(promise).rejects.toThrow();
+	});
 });
