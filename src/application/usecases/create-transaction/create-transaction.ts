@@ -12,16 +12,13 @@ export class CreateTransaction implements ICreateTransaction {
 		this.decrypter = decrypter;
 	}
 
-	async execute(transactionData: CreateTransactionModel): Promise<TransactionModel> {
+	async execute(
+		transactionData: CreateTransactionModel
+	): Promise<TransactionModel | null> {
 		const { token, creditedUsername, value } = transactionData;
 
 		await this.decrypter.decrypt(token);
 
-		return {
-			id: "id",
-			creditedAccountId: "account",
-			debitedAccountId: "account",
-			value: 99,
-		};
+		return null;
 	}
 }
