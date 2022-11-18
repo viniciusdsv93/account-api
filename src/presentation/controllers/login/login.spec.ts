@@ -1,4 +1,4 @@
-import { IFindUserByUsernameRepository } from "../../../application/protocols/repositories/find-user-by-username-repository";
+import { IFindUserByUsernameRepository } from "../../../application/protocols/repositories/user/find-user-by-username-repository";
 import { UserModel } from "../../../domain/models/user";
 import {
 	AuthenticationModel,

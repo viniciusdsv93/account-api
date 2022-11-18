@@ -1,4 +1,4 @@
-import { IUsernameAvailableRepository } from "../../../application/protocols/repositories/username-available-repository";
+import { IUsernameAvailableRepository } from "../../../application/protocols/repositories/user/username-available-repository";
 import { IRegisterUser } from "../../../domain/usecases/register-user";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";

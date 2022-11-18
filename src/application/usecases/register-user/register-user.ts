@@ -1,9 +1,9 @@
 import { AccountModel } from "../../../domain/models/account";
 import { UserModel } from "../../../domain/models/user";
 import { IRegisterUser, RegisterUserModel } from "../../../domain/usecases/register-user";
-import { IAddAccountRepository } from "../../protocols/repositories/add-account-repository";
-import { IAddAccountToUserRepository } from "../../protocols/repositories/add-account-to-user-repository";
-import { IAddUserRepository } from "../../protocols/repositories/add-user-repository";
+import { IAddAccountRepository } from "../../protocols/repositories/account/add-account-repository";
+import { IAddAccountToUserRepository } from "../../protocols/repositories/user/add-account-to-user-repository";
+import { IAddUserRepository } from "../../protocols/repositories/user/add-user-repository";
 import { IHasher } from "../../protocols/cryptography/hasher";
 
 export class RegisterUser implements IRegisterUser {

@@ -1,8 +1,8 @@
-import { IAddAccountToUserRepository } from "../../../../application/protocols/repositories/add-account-to-user-repository";
-import { IAddUserRepository } from "../../../../application/protocols/repositories/add-user-repository";
-import { IFindUserByUsernameRepository } from "../../../../application/protocols/repositories/find-user-by-username-repository";
-import { IUpdateAccessTokenRepository } from "../../../../application/protocols/repositories/update-access-token-repository";
-import { IUsernameAvailableRepository } from "../../../../application/protocols/repositories/username-available-repository";
+import { IAddAccountToUserRepository } from "../../../../application/protocols/repositories/user/add-account-to-user-repository";
+import { IAddUserRepository } from "../../../../application/protocols/repositories/user/add-user-repository";
+import { IFindUserByUsernameRepository } from "../../../../application/protocols/repositories/user/find-user-by-username-repository";
+import { IUpdateAccessTokenRepository } from "../../../../application/protocols/repositories/user/update-access-token-repository";
+import { IUsernameAvailableRepository } from "../../../../application/protocols/repositories/user/username-available-repository";
 import { UserModel } from "../../../../domain/models/user";
 import {
 	RegisterUserModel,

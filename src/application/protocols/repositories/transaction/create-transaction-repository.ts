@@ -1,4 +1,4 @@
-import { TransactionModel } from "../../../domain/models/transaction";
+import { TransactionModel } from "../../../../domain/models/transaction";
 
 export type TransactionData = {
 	debitedAccountId: string;

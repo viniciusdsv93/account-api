@@ -1,4 +1,4 @@
-import { IFindUserByUsernameRepository } from "../../../application/protocols/repositories/find-user-by-username-repository";
+import { IFindUserByUsernameRepository } from "../../../application/protocols/repositories/user/find-user-by-username-repository";
 import { IAuthentication } from "../../../domain/usecases/authentication";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";

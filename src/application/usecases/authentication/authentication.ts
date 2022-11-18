@@ -4,8 +4,8 @@ import {
 } from "../../../domain/usecases/authentication";
 import { IHashComparer } from "../../protocols/cryptography/hash-comparer";
 import { IEncrypter } from "../../protocols/cryptography/encrypter";
-import { IFindUserByUsernameRepository } from "../../protocols/repositories/find-user-by-username-repository";
-import { IUpdateAccessTokenRepository } from "../../protocols/repositories/update-access-token-repository";
+import { IFindUserByUsernameRepository } from "../../protocols/repositories/user/find-user-by-username-repository";
+import { IUpdateAccessTokenRepository } from "../../protocols/repositories/user/update-access-token-repository";
 
 export class Authentication implements IAuthentication {
 	private readonly findByUsernameRepository: IFindUserByUsernameRepository;

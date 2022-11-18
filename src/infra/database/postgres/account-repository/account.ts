@@ -1,5 +1,5 @@
-import { IAddAccountRepository } from "../../../../application/protocols/repositories/add-account-repository";
-import { IFindAccountByUserIdRepository } from "../../../../application/protocols/repositories/find-account-by-user-id-repository";
+import { IAddAccountRepository } from "../../../../application/protocols/repositories/account/add-account-repository";
+import { IFindAccountByUserIdRepository } from "../../../../application/protocols/repositories/account/find-account-by-user-id-repository";
 import { AccountModel } from "../../../../domain/models/account";
 import { prismaClient } from "../prisma/prisma-client";
 

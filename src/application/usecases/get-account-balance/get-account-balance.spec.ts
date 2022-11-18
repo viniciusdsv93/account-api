@@ -1,7 +1,7 @@
 import { AccountModel } from "../../../domain/models/account";
 import { IGetAccountBalance } from "../../../domain/usecases/get-account-balance";
 import { IDecrypter } from "../../protocols/cryptography/decrypter";
-import { IFindAccountByUserIdRepository } from "../../protocols/repositories/find-account-by-user-id-repository";
+import { IFindAccountByUserIdRepository } from "../../protocols/repositories/account/find-account-by-user-id-repository";
 import { GetAccountBalance } from "./get-account-balance";
 
 describe("Get Account Balance UseCase", () => {

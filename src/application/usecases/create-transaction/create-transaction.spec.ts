@@ -4,8 +4,8 @@ import { AccountModel } from "../../../domain/models/account";
 import { UserModel } from "../../../domain/models/user";
 import { ICreateTransaction } from "../../../domain/usecases/create-transaction";
 import { IDecrypter } from "../../protocols/cryptography/decrypter";
-import { IFindAccountByUserIdRepository } from "../../protocols/repositories/find-account-by-user-id-repository";
-import { IFindUserByUsernameRepository } from "../../protocols/repositories/find-user-by-username-repository";
+import { IFindAccountByUserIdRepository } from "../../protocols/repositories/account/find-account-by-user-id-repository";
+import { IFindUserByUsernameRepository } from "../../protocols/repositories/user/find-user-by-username-repository";
 import { CreateTransaction } from "./create-transaction";
 
 //verify token

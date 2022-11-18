@@ -1,4 +1,4 @@
-import { IUsernameAvailableRepository } from "../../../application/protocols/repositories/username-available-repository";
+import { IUsernameAvailableRepository } from "../../../application/protocols/repositories/user/username-available-repository";
 import { UserModel } from "../../../domain/models/user";
 import {
 	IRegisterUser,
