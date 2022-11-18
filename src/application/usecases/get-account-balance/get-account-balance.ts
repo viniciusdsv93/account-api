@@ -18,7 +18,10 @@ export class GetAccountBalance implements IGetAccountBalance {
 		const payload = await this.decrypter.decrypt(token);
 		if (payload) {
 			const { id } = payload;
-			await this.findAccountByUserIdRepository.findByUserId(id);
+			const account = await this.findAccountByUserIdRepository.findByUserId(id);
+			if (account) {
+				return account.balance;
+			}
 		}
 
 		return null;
