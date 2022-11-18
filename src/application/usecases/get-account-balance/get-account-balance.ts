@@ -15,15 +15,18 @@ export class GetAccountBalance implements IGetAccountBalance {
 	}
 
 	async execute(token: string): Promise<number | null> {
-		const payload = await this.decrypter.decrypt(token);
-		if (payload) {
-			const { id } = payload;
-			const account = await this.findAccountByUserIdRepository.findByUserId(id);
-			if (account) {
-				return account.balance;
+		try {
+			const payload = await this.decrypter.decrypt(token);
+			if (payload) {
+				const { id } = payload;
+				const account = await this.findAccountByUserIdRepository.findByUserId(id);
+				if (account) {
+					return account.balance;
+				}
 			}
+			return null;
+		} catch (error) {
+			return null;
 		}
-
-		return null;
 	}
 }
