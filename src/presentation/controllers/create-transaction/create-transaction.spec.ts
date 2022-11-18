@@ -4,7 +4,7 @@ import {
 	ICreateTransaction,
 } from "../../../domain/usecases/create-transaction";
 import { MissingParamError } from "../../errors/missing-param-error";
-import { badRequest, unauthorized } from "../../helpers/http";
+import { badRequest, serverError, unauthorized } from "../../helpers/http";
 import { CreateTransactionController } from "./create-transaction";
 
 describe("Create Transaction Controller", () => {
@@ -97,5 +97,22 @@ describe("Create Transaction Controller", () => {
 			creditedUsername: "any_credited_username",
 			value: 99,
 		});
+	});
+
+	test("Should return 500 if Authentication throws", async () => {
+		const { sut, createTransactionStub } = makeSut();
+		jest.spyOn(createTransactionStub, "execute").mockReturnValueOnce(
+			new Promise((resolve, reject) => reject(new Error()))
+		);
+		const httpResponse = await sut.handle({
+			body: {
+				creditedUsername: "any_credited_username",
+				value: 99,
+			},
+			headers: {
+				authorization: "Bearer any_token",
+			},
+		});
+		expect(httpResponse).toEqual(serverError(new Error()));
 	});
 });
