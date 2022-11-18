@@ -49,4 +49,17 @@ describe("Create Transaction UseCase", () => {
 		});
 		expect(decrypterSpy).toHaveBeenCalledWith("valid_token");
 	});
+
+	test("Should throw if Decrypter throws", async () => {
+		const { sut, decrypterStub } = makeSut();
+		jest.spyOn(decrypterStub, "decrypt").mockReturnValueOnce(
+			new Promise((resolve, reject) => reject(new Error()))
+		);
+		const promise = sut.execute({
+			token: "valid_token",
+			creditedUsername: "valid_username",
+			value: 99,
+		});
+		await expect(promise).rejects.toThrow();
+	});
 });
