@@ -9,7 +9,6 @@ export class GetAccountBalance implements IGetAccountBalance {
 	}
 
 	async execute(token: string): Promise<number> {
-		await this.decrypter.decrypt(token);
-		return new Promise((resolve) => resolve(5));
+		return await this.decrypter.decrypt(token);
 	}
 }
