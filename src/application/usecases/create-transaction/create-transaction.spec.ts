@@ -132,4 +132,17 @@ describe("Create Transaction UseCase", () => {
 		});
 		await expect(promise).rejects.toThrow();
 	});
+
+	test("Should return null if FindAccountByUserIdRepository returns null", async () => {
+		const { sut, findAccountByUserIdRepositoryStub } = makeSut();
+		jest.spyOn(findAccountByUserIdRepositoryStub, "findByUserId").mockReturnValueOnce(
+			new Promise((resolve) => resolve(null))
+		);
+		const response = await sut.execute({
+			token: "valid_token",
+			creditedUsername: "valid_username",
+			value: 99,
+		});
+		expect(response).toBeNull();
+	});
 });
