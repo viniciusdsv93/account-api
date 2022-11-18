@@ -61,6 +61,14 @@ describe("Create Transaction UseCase", () => {
 		return new FindUserByUsernameRepositoryStub();
 	};
 
+	const makeFakeTransaction = () => {
+		return {
+			token: "valid_token",
+			creditedUsername: "valid_username",
+			value: 99,
+		};
+	};
+
 	type SutTypes = {
 		sut: ICreateTransaction;
 		decrypterStub: IDecrypter;
@@ -88,11 +96,7 @@ describe("Create Transaction UseCase", () => {
 	test("Should call Decrypter with the correct token", async () => {
 		const { sut, decrypterStub } = makeSut();
 		const decrypterSpy = jest.spyOn(decrypterStub, "decrypt");
-		await sut.execute({
-			token: "valid_token",
-			creditedUsername: "valid_username",
-			value: 99,
-		});
+		await sut.execute(makeFakeTransaction());
 		expect(decrypterSpy).toHaveBeenCalledWith("valid_token");
 	});
 
@@ -101,11 +105,7 @@ describe("Create Transaction UseCase", () => {
 		jest.spyOn(decrypterStub, "decrypt").mockReturnValueOnce(
 			new Promise((resolve, reject) => reject(new Error()))
 		);
-		const promise = sut.execute({
-			token: "valid_token",
-			creditedUsername: "valid_username",
-			value: 99,
-		});
+		const promise = sut.execute(makeFakeTransaction());
 		await expect(promise).rejects.toThrow();
 	});
 
@@ -114,11 +114,7 @@ describe("Create Transaction UseCase", () => {
 		jest.spyOn(decrypterStub, "decrypt").mockReturnValueOnce(
 			new Promise((resolve) => resolve(null))
 		);
-		const payload = await sut.execute({
-			token: "valid_token",
-			creditedUsername: "valid_username",
-			value: 99,
-		});
+		const payload = await sut.execute(makeFakeTransaction());
 		expect(payload).toBeNull();
 	});
 
@@ -134,11 +130,7 @@ describe("Create Transaction UseCase", () => {
 			findAccountByUserIdRepositoryStub,
 			"findByUserId"
 		);
-		await sut.execute({
-			token: "valid_token",
-			creditedUsername: "valid_username",
-			value: 99,
-		});
+		await sut.execute(makeFakeTransaction());
 		expect(findAccountSpy).toHaveBeenCalledWith("valid_id");
 	});
 
@@ -147,11 +139,7 @@ describe("Create Transaction UseCase", () => {
 		jest.spyOn(findAccountByUserIdRepositoryStub, "findByUserId").mockReturnValueOnce(
 			new Promise((resolve, reject) => reject(new Error()))
 		);
-		const promise = sut.execute({
-			token: "valid_token",
-			creditedUsername: "valid_username",
-			value: 99,
-		});
+		const promise = sut.execute(makeFakeTransaction());
 		await expect(promise).rejects.toThrow();
 	});
 
@@ -160,11 +148,7 @@ describe("Create Transaction UseCase", () => {
 		jest.spyOn(findAccountByUserIdRepositoryStub, "findByUserId").mockReturnValueOnce(
 			new Promise((resolve) => resolve(null))
 		);
-		const response = await sut.execute({
-			token: "valid_token",
-			creditedUsername: "valid_username",
-			value: 99,
-		});
+		const response = await sut.execute(makeFakeTransaction());
 		expect(response).toBeNull();
 	});
 
@@ -182,11 +166,7 @@ describe("Create Transaction UseCase", () => {
 			findUserByUsernameRepositoryStub,
 			"findByUsername"
 		);
-		await sut.execute({
-			token: "valid_token",
-			creditedUsername: "valid_username",
-			value: 99,
-		});
+		await sut.execute(makeFakeTransaction());
 		expect(findUserSpy).toHaveBeenCalledWith("valid_username");
 	});
 });
