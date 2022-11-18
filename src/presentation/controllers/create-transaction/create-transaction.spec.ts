@@ -15,4 +15,17 @@ describe("Create Transaction Controller", () => {
 			badRequest(new MissingParamError("debitedUsername"))
 		);
 	});
+
+	test("Should return 400 if no creditedUsername is provided", async () => {
+		const sut = new CreateTransactionController();
+		const httpResponse = await sut.handle({
+			body: {
+				debitedUsername: "any_debited_username",
+				value: 99,
+			},
+		});
+		expect(httpResponse).toEqual(
+			badRequest(new MissingParamError("creditedUsername"))
+		);
+	});
 });
