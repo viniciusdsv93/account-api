@@ -1,6 +1,6 @@
 import { IGetAccountBalance } from "../../../domain/usecases/get-account-balance";
 import { MissingParamError } from "../../errors/missing-param-error";
-import { badRequest, ok } from "../../helpers/http";
+import { badRequest, ok, serverError } from "../../helpers/http";
 import { GetAccountBalanceController } from "./get-account-balance";
 
 const makeGetAccountBalanceStub = (): IGetAccountBalance => {
@@ -44,6 +44,19 @@ describe("Get Account Balance Controller", () => {
 			},
 		});
 		expect(getBalanceSpy).toHaveBeenCalledWith("any_token");
+	});
+
+	test("Should return 500 if GetAccountBalanceUsecase throws", async () => {
+		const { sut, getAccountBalanceStub } = makeSut();
+		jest.spyOn(getAccountBalanceStub, "execute").mockReturnValueOnce(
+			new Promise((resolve, reject) => reject(new Error()))
+		);
+		const httpResponse = await sut.handle({
+			headers: {
+				authorization: "Bearer any_token",
+			},
+		});
+		expect(httpResponse).toEqual(serverError(new Error()));
 	});
 
 	test("Should return the balance value on GetAccountBalanceUsecase success", async () => {
