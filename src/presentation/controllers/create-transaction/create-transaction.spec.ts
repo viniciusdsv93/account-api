@@ -1,5 +1,5 @@
 import { MissingParamError } from "../../errors/missing-param-error";
-import { badRequest } from "../../helpers/http";
+import { badRequest, unauthorized } from "../../helpers/http";
 import { CreateTransactionController } from "./create-transaction";
 
 describe("Create Transaction Controller", () => {
@@ -21,6 +21,9 @@ describe("Create Transaction Controller", () => {
 				debitedUsername: "any_debited_username",
 				value: 99,
 			},
+			headers: {
+				authorization: "Bearer any_token",
+			},
 		});
 		expect(httpResponse).toEqual(
 			badRequest(new MissingParamError("creditedUsername"))
@@ -34,7 +37,23 @@ describe("Create Transaction Controller", () => {
 				creditedUsername: "any_credited_username",
 				debitedUsername: "any_debited_username",
 			},
+			headers: {
+				authorization: "Bearer any_token",
+			},
 		});
 		expect(httpResponse).toEqual(badRequest(new MissingParamError("value")));
+	});
+
+	test("Should return 401 if no token is provided", async () => {
+		const { sut } = makeSut();
+		const httpResponse = await sut.handle({
+			body: {
+				creditedUsername: "any_credited_username",
+				debitedUsername: "any_debited_username",
+				value: 99,
+			},
+			headers: {},
+		});
+		expect(httpResponse).toEqual(unauthorized());
 	});
 });
