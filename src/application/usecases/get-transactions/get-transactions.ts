@@ -22,7 +22,12 @@ export class GetTransactions implements IGetTransactions {
 		token: string,
 		filters: GetTransactionsModel
 	): Promise<TransactionModel[] | null> {
-		await this.decrypter.decrypt(token);
+		const payload = await this.decrypter.decrypt(token);
+
+		if (payload) {
+			const { id } = payload;
+			await this.getTransactionsRepository.get(id, filters);
+		}
 		return null;
 	}
 }
