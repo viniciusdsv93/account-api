@@ -100,14 +100,14 @@ describe("Get Account Balance UseCase", () => {
 		expect(getTransactionsSpy).toHaveBeenCalledWith("valid_id", makeFakeFilters());
 	});
 
-	// test("Should throw if FindAccountByUserIdRepository throws", async () => {
-	// 	const { sut, findAccountByUserIdRepositoryStub } = makeSut();
-	// 	jest.spyOn(findAccountByUserIdRepositoryStub, "findByUserId").mockReturnValueOnce(
-	// 		new Promise((resolve, reject) => reject(new Error()))
-	// 	);
-	// 	const promise = sut.execute("valid_token");
-	// 	await expect(promise).rejects.toThrow();
-	// });
+	test("Should throw if GetTransactionsRepository throws", async () => {
+		const { sut, getTransactionsRepository } = makeSut();
+		jest.spyOn(getTransactionsRepository, "get").mockReturnValueOnce(
+			new Promise((resolve, reject) => reject(new Error()))
+		);
+		const promise = sut.execute("valid_token", makeFakeFilters());
+		await expect(promise).rejects.toThrow();
+	});
 
 	// test("Should return null if FindAccountByUserIdRepository returns null", async () => {
 	// 	const { sut, findAccountByUserIdRepositoryStub } = makeSut();
