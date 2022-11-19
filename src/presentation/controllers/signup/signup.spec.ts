@@ -239,8 +239,6 @@ describe("Sign Up Controller", () => {
 			created({
 				id: "1",
 				username: "valid_username",
-				password: "valid_password",
-				accountId: "2",
 			})
 		);
 	});
