@@ -5,7 +5,12 @@ import { TransactionModel } from "../../../domain/models/transaction";
 import { UserModel } from "../../../domain/models/user";
 import { ICreateTransaction } from "../../../domain/usecases/create-transaction";
 import { InvalidParamError } from "../../../presentation/errors/invalid-param-error";
-import { badRequest, ok, unauthorized } from "../../../presentation/helpers/http";
+import {
+	badRequest,
+	ok,
+	serverError,
+	unauthorized,
+} from "../../../presentation/helpers/http";
 import { IDecrypter } from "../../protocols/cryptography/decrypter";
 import { IFindAccountByUserIdRepository } from "../../protocols/repositories/account/find-account-by-user-id-repository";
 import {
@@ -279,6 +284,34 @@ describe("Create Transaction UseCase", () => {
 			creditedAccountId: "valid_account_id",
 			value: 15.25,
 		});
+	});
+
+	test("Should return serverError if CreateTransactionRepository returns null", async () => {
+		const {
+			sut,
+			findAccountByUserIdRepositoryStub,
+			createTransactionRepositoryStub,
+		} = makeSut();
+		const randomNumber = Math.random();
+		jest.spyOn(findAccountByUserIdRepositoryStub, "findByUserId").mockReturnValueOnce(
+			new Promise((resolve) =>
+				resolve({
+					id: `valid_account_id_${randomNumber}`,
+					balance: 87.3,
+				})
+			)
+		);
+		jest.spyOn(createTransactionRepositoryStub, "create").mockReturnValueOnce(
+			new Promise((resolve) => resolve(null))
+		);
+		const response = await sut.execute(makeFakeTransaction());
+		expect(response).toEqual(
+			serverError(
+				new Error(
+					"Error when trying to process the transaction. Please, try again later"
+				)
+			)
+		);
 	});
 
 	test("Should return ok with a transaction on CreateTransactionRepository success", async () => {
