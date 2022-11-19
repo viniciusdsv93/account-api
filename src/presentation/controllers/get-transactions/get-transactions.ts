@@ -17,25 +17,30 @@ export class GetTransactionsController implements Controller {
 			return badRequest(new MissingParamError("token"));
 		}
 
-		if (httpRequest.query.date) {
+		if (httpRequest.query?.date) {
 			const date = httpRequest.query.date;
 			if (new Date(date).toString() === "Invalid Date") {
 				return badRequest(new InvalidParamError("date", "invalid date format"));
 			}
 		}
 
-		if (httpRequest.query.type) {
+		if (httpRequest.query?.type) {
 			const type = httpRequest.query.type;
 			if (type !== "cash-in" && type !== "cash-out") {
 				return badRequest(new InvalidParamError("type", "invalid type format"));
 			}
 		}
+
 		const filters = {
-			date: httpRequest.query.date,
-			type: httpRequest.query.type,
+			date: httpRequest.query?.date,
+			type: httpRequest.query?.type,
 		};
 
-		await this.getTransactions.execute(filters);
+		if (httpRequest.query?.date || httpRequest.query?.type) {
+			await this.getTransactions.execute(filters);
+		} else {
+			await this.getTransactions.execute();
+		}
 
 		return new Promise((resolve) => resolve(ok("")));
 	}
