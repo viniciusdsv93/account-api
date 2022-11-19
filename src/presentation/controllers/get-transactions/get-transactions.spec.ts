@@ -3,6 +3,7 @@ import {
 	GetTransactionsModel,
 	IGetTransactions,
 } from "../../../domain/usecases/get-transactions";
+import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { badRequest } from "../../helpers/http";
 import { HttpRequest } from "../../protocols/http";
@@ -47,6 +48,10 @@ const makeFakeRequest = (): HttpRequest => {
 		headers: {
 			authorization: "Bearer any_token",
 		},
+		query: {
+			date: "2022-10-30",
+			type: "cash-out",
+		},
 	};
 };
 
@@ -57,5 +62,21 @@ describe("Get Transactions Controller", () => {
 			headers: {},
 		});
 		expect(httpResponse).toEqual(badRequest(new MissingParamError("token")));
+	});
+
+	test("Should return 400 if invalid date filter is provided", async () => {
+		const { sut } = makeSut();
+		const httpResponse = await sut.handle({
+			headers: {
+				authorization: "Bearer any_token",
+			},
+			query: {
+				date: "202210-30",
+				type: "cash-out",
+			},
+		});
+		expect(httpResponse).toEqual(
+			badRequest(new InvalidParamError("date", "invalid date format"))
+		);
 	});
 });
