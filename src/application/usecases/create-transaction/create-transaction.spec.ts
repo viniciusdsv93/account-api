@@ -1,10 +1,15 @@
 //TODO
 
 import { AccountModel } from "../../../domain/models/account";
+import { TransactionModel } from "../../../domain/models/transaction";
 import { UserModel } from "../../../domain/models/user";
 import { ICreateTransaction } from "../../../domain/usecases/create-transaction";
 import { IDecrypter } from "../../protocols/cryptography/decrypter";
 import { IFindAccountByUserIdRepository } from "../../protocols/repositories/account/find-account-by-user-id-repository";
+import {
+	ICreateTransactionRepository,
+	TransactionData,
+} from "../../protocols/repositories/transaction/create-transaction-repository";
 import { IFindUserByUsernameRepository } from "../../protocols/repositories/user/find-user-by-username-repository";
 import { CreateTransaction } from "./create-transaction";
 
@@ -61,11 +66,27 @@ describe("Create Transaction UseCase", () => {
 		return new FindUserByUsernameRepositoryStub();
 	};
 
+	const makeCreateTransactionRepositoryStub = (): ICreateTransactionRepository => {
+		class CreateTransactionRepositoryStub implements ICreateTransactionRepository {
+			async create(transactionData: TransactionData): Promise<TransactionModel> {
+				return new Promise((resolve) =>
+					resolve({
+						id: "transaction_id",
+						debitedAccountId: "debited_account_id",
+						creditedAccountId: "credited_account_id",
+						value: 55.4,
+					})
+				);
+			}
+		}
+		return new CreateTransactionRepositoryStub();
+	};
+
 	const makeFakeTransaction = () => {
 		return {
 			token: "valid_token",
 			creditedUsername: "valid_username",
-			value: 99,
+			value: 15.25,
 		};
 	};
 
@@ -74,22 +95,26 @@ describe("Create Transaction UseCase", () => {
 		decrypterStub: IDecrypter;
 		findAccountByUserIdRepositoryStub: IFindAccountByUserIdRepository;
 		findUserByUsernameRepositoryStub: IFindUserByUsernameRepository;
+		createTransactionRepositoryStub: ICreateTransactionRepository;
 	};
 
 	const makeSut = (): SutTypes => {
 		const decrypterStub = makeDecrypterStub();
 		const findAccountByUserIdRepositoryStub = makeFindAccountByUserIdRepositoryStub();
 		const findUserByUsernameRepositoryStub = makeFindUserByUsernameRepositoryStub();
+		const createTransactionRepositoryStub = makeCreateTransactionRepositoryStub();
 		const sut = new CreateTransaction(
 			decrypterStub,
 			findAccountByUserIdRepositoryStub,
-			findUserByUsernameRepositoryStub
+			findUserByUsernameRepositoryStub,
+			createTransactionRepositoryStub
 		);
 		return {
 			sut,
 			decrypterStub,
 			findAccountByUserIdRepositoryStub,
 			findUserByUsernameRepositoryStub,
+			createTransactionRepositoryStub,
 		};
 	};
 
@@ -198,5 +223,32 @@ describe("Create Transaction UseCase", () => {
 		expect(findUserRepositoryResponse).toHaveProperty("username");
 		expect(findUserRepositoryResponse).toHaveProperty("password");
 		expect(findUserRepositoryResponse).toHaveProperty("accountId");
+	});
+
+	test("Should call CreateTransactionRepository with the correct values", async () => {
+		const {
+			sut,
+			createTransactionRepositoryStub,
+			findAccountByUserIdRepositoryStub,
+		} = makeSut();
+		const randomNumber = Math.random();
+		jest.spyOn(findAccountByUserIdRepositoryStub, "findByUserId").mockReturnValueOnce(
+			new Promise((resolve) =>
+				resolve({
+					id: `valid_account_id_${randomNumber}`,
+					balance: 87.3,
+				})
+			)
+		);
+		const createTransactionSpy = jest.spyOn(
+			createTransactionRepositoryStub,
+			"create"
+		);
+		await sut.execute(makeFakeTransaction());
+		expect(createTransactionSpy).toHaveBeenCalledWith({
+			debitedAccountId: `valid_account_id_${randomNumber}`,
+			creditedAccountId: "valid_account_id",
+			value: 15.25,
+		});
 	});
 });
