@@ -3,7 +3,7 @@ import { GetTransactionsModel } from "../../../../domain/usecases/get-transactio
 
 export interface IGetTransactionsRepository {
 	get(
-		userId: string,
+		accountId: string,
 		filters: GetTransactionsModel
 	): Promise<TransactionModel[] | null>;
 }
