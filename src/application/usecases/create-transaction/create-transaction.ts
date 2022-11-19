@@ -71,7 +71,7 @@ export class CreateTransaction implements ICreateTransaction {
 			return null;
 		}
 
-		await this.createTransactionRepository.create({
+		return await this.createTransactionRepository.create({
 			debitedAccountId: debitedAccount.id,
 			creditedAccountId: creditedAccount.id,
 			value,
