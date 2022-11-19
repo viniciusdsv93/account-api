@@ -1,0 +1,98 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"title": "API de criação e gerenciamento de contas e transações",
+		"description": "Esta API destina-se ao controle de contas de usuários e suas transações, com as opções de cadastro, login, consultar saldo, realizar transação e consultar transações",
+		"contact": {
+			"name": "Suporte",
+			"email": "viniciusdsv93@gmail.com"
+		},
+		"version": "1.0.0"
+	},
+	"paths": {
+		"/results": {
+			"get": {
+				"summary": "Retorna a listagem de operações cadastradas",
+				"tags": ["Listagem"],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"id": {
+												"type": "string"
+											},
+											"mathExpression": {
+												"type": "string"
+											},
+											"result": {
+												"type": "string"
+											},
+											"date": {
+												"type": "string"
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/calculate": {
+			"post": {
+				"summary": "Calcula uma expressão matemática e persiste no banco de dados",
+				"tags": ["Cálculo"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"mathExpression": {
+										"type": "string"
+									}
+								}
+							},
+							"examples": {
+								"mathExpression": {
+									"value": "25 + (10 * (5 + 2))"
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"400": {
+						"description": "Campo obrigatório não informado"
+					},
+					"201": {
+						"description": "CREATED",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"mathExpression": {
+											"type": "string"
+										},
+										"result": {
+											"type": "integer"
+										},
+										"date": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

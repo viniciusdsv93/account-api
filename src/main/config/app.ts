@@ -2,12 +2,11 @@ import express from "express";
 import { bodyParser } from "../middlewares/bodyParser";
 import { contentType } from "../middlewares/contentType";
 import { cors } from "../middlewares/cors";
-// import { router } from "../routes/routes";
 import * as dotenv from "dotenv";
 import { router } from "../routes/routes";
 dotenv.config();
-// import { serve, setup } from "swagger-ui-express";
-// import swaggerDocument from "../../../swagger.json";
+import { serve, setup } from "swagger-ui-express";
+import swaggerDocument from "../../../swagger.json";
 
 export class App {
 	private readonly express: express.Application;
@@ -15,7 +14,7 @@ export class App {
 
 	constructor() {
 		this.express = express();
-		// this.documentation();
+		this.documentation();
 		this.middlewares();
 		this.routes();
 		this.listen();
@@ -27,9 +26,9 @@ export class App {
 		this.express.use(contentType);
 	}
 
-	// private documentation() {
-	// 	this.express.use("/api-docs", serve, setup(swaggerDocument));
-	// }
+	private documentation() {
+		this.express.use("/api-docs", serve, setup(swaggerDocument));
+	}
 
 	private routes() {
 		this.express.use(router);
@@ -37,7 +36,7 @@ export class App {
 
 	private listen() {
 		this.express.listen(this.port, () => {
-			console.log(`Server running on http://localhost:${this.port}`);
+			console.log(`Server running on http://localhost:${this.port}/api-docs`);
 		});
 	}
 }
