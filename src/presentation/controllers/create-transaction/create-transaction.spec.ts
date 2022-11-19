@@ -4,7 +4,7 @@ import {
 	ICreateTransaction,
 } from "../../../domain/usecases/create-transaction";
 import { MissingParamError } from "../../errors/missing-param-error";
-import { badRequest, serverError, unauthorized } from "../../helpers/http";
+import { badRequest, ok, serverError, unauthorized } from "../../helpers/http";
 import { HttpRequest } from "../../protocols/http";
 import { CreateTransactionController } from "./create-transaction";
 
@@ -120,5 +120,11 @@ describe("Create Transaction Controller", () => {
 		);
 		const httpResponse = await sut.handle(makeFakeRequest());
 		expect(httpResponse).toEqual(unauthorized());
+	});
+
+	test("Should return no content on CreateTransaction success", async () => {
+		const { sut } = makeSut();
+		const httpResponse = await sut.handle(makeFakeRequest());
+		expect(httpResponse).toEqual(ok({ transactionId: "valid_transaction_id" }));
 	});
 });
