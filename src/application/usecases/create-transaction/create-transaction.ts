@@ -63,9 +63,9 @@ export class CreateTransaction implements ICreateTransaction {
 			return null;
 		}
 
-		// if (debitedAccount.id === creditedAccount.id) {
-		// 	return null;
-		// }
+		if (debitedAccount.id === creditedAccount.id) {
+			return null;
+		}
 
 		if (value > debitedAccount.balance) {
 			return null;
