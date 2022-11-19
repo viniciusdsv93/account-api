@@ -10,32 +10,51 @@
 		"version": "1.0.0"
 	},
 	"paths": {
-		"/results": {
-			"get": {
-				"summary": "Retorna a listagem de operações cadastradas",
-				"tags": ["Listagem"],
+		"/register": {
+			"post": {
+				"summary": "Cadastra um(a) usuário(a) e gera automaticamente uma conta vinculada a ele(a)",
+				"tags": ["Login"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+                "type": "object",
+								"properties": {
+									"username": {
+										"type": "string",
+                    "required": true
+									},
+                  "password": {
+										"type": "string",
+                    "required": true
+									},
+                  "passwordConfirmation": {
+										"type": "string",
+                    "required": true
+									}
+								}
+							}
+						}
+					}
+				},
 				"responses": {
-					"200": {
-						"description": "OK",
+					"400": {
+						"description": "Campo obrigatório não informado ou parâmetro inválido"
+					},
+          "500": {
+						"description": "Erro interno do servidor"
+					},
+					"201": {
+						"description": "CREATED",
 						"content": {
 							"application/json": {
 								"schema": {
-									"type": "array",
-									"items": {
-										"type": "object",
-										"properties": {
-											"id": {
-												"type": "string"
-											},
-											"mathExpression": {
-												"type": "string"
-											},
-											"result": {
-												"type": "string"
-											},
-											"date": {
-												"type": "string"
-											}
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"username": {
+											"type": "string"
 										}
 									}
 								}
@@ -45,23 +64,24 @@
 				}
 			}
 		},
-		"/calculate": {
+    "/login": {
 			"post": {
-				"summary": "Calcula uma expressão matemática e persiste no banco de dados",
-				"tags": ["Cálculo"],
+				"summary": "Faz o login de um(a) usuário(a) e retorna um token JWT em caso de sucesso",
+				"tags": ["Login"],
 				"requestBody": {
 					"content": {
 						"application/json": {
 							"schema": {
+                "type": "object",
 								"properties": {
-									"mathExpression": {
-										"type": "string"
+									"username": {
+										"type": "string",
+                    "required": true
+									},
+                  "password": {
+										"type": "string",
+                    "required": true
 									}
-								}
-							},
-							"examples": {
-								"mathExpression": {
-									"value": "25 + (10 * (5 + 2))"
 								}
 							}
 						}
@@ -71,22 +91,176 @@
 					"400": {
 						"description": "Campo obrigatório não informado"
 					},
-					"201": {
-						"description": "CREATED",
+          "401": {
+						"description": "Não autorizado"
+					},
+          "500": {
+						"description": "Erro interno do servidor"
+					},
+					"200": {
+						"description": "OK",
 						"content": {
 							"application/json": {
 								"schema": {
 									"properties": {
-										"mathExpression": {
-											"type": "string"
-										},
-										"result": {
-											"type": "integer"
-										},
-										"date": {
+										"accessToken": {
 											"type": "string"
 										}
 									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+    "/balance": {
+			"get": {
+				"summary": "Retorna o saldo de um(a) usuário(a) caso o token fornecido seja validado",
+				"tags": ["Saldo"],
+				"responses": {
+					"400": {
+						"description": "Campo obrigatório não informado"
+					},
+          "401": {
+						"description": "Não autorizado"
+					},
+          "500": {
+						"description": "Erro interno do servidor"
+					},
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"balance": {
+											"type": "number"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+    "/transaction": {
+			"post": {
+				"summary": "Realiza uma transação especificando a conta destinatária e o valor",
+				"tags": ["Transações"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+                "type": "object",
+								"properties": {
+									"creditedUsername": {
+										"type": "string",
+                    "required": true
+									},
+                  "value": {
+										"type": "number",
+                    "required": true
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"400": {
+						"description": "Campo obrigatório não informado"
+					},
+          "401": {
+						"description": "Não autorizado"
+					},
+          "500": {
+						"description": "Erro interno do servidor"
+					},
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"debitedAccountId": {
+											"type": "string"
+										},
+                    "creditedAccountId": {
+											"type": "string"
+										},
+                    "value": {
+											"type": "number"
+										},
+                    "createdAt": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+      "get": {
+				"summary": "Retorna as transações do(a) usuário(a) de acordo com filtros opcionais fornecidos caso o token seja validado",
+				"tags": ["Transações"],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "description": "data das transações",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "tipo ('check-in' ou 'check-out') das transações",
+            "required": false,
+            "type": "string"
+          }
+        ],
+				"responses": {
+					"400": {
+						"description": "Parâmetro inválido"
+					},
+          "401": {
+						"description": "Não autorizado"
+					},
+          "500": {
+						"description": "Erro interno do servidor"
+					},
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "debitedAccountId": {
+                        "type": "string"
+                      },
+                      "creditedAccountId": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "number"
+                      },
+                      "createdAt": {
+                        "type": "string"
+                      }
+                    }
+                  }
 								}
 							}
 						}
