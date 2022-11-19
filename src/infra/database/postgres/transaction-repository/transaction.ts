@@ -64,6 +64,14 @@ export class TransactionPrismaRepository
 		accountId: string,
 		filters: GetTransactionsModel
 	): Promise<TransactionModel[] | null> {
+		if (filters.type === "cash-out") {
+			return prismaClient.transaction.findMany({
+				where: {
+					debitedAccountId: accountId,
+				},
+			});
+		}
+
 		return prismaClient.transaction.findMany({
 			where: {
 				debitedAccountId: accountId,
