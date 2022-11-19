@@ -5,7 +5,7 @@ import {
 } from "../../../domain/usecases/get-transactions";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
-import { badRequest, ok } from "../../helpers/http";
+import { badRequest, ok, serverError } from "../../helpers/http";
 import { HttpRequest } from "../../protocols/http";
 import { GetTransactionsController } from "./get-transactions";
 
@@ -134,6 +134,15 @@ describe("Get Transactions Controller", () => {
 			date: undefined,
 			type: undefined,
 		});
+	});
+
+	test("Should return 500 if GetTransactionsUsecase throws", async () => {
+		const { sut, getTransactionsStub } = makeSut();
+		jest.spyOn(getTransactionsStub, "execute").mockReturnValueOnce(
+			new Promise((resolve, reject) => reject(new Error()))
+		);
+		const httpResponse = await sut.handle(makeFakeRequest());
+		expect(httpResponse).toEqual(serverError(new Error()));
 	});
 
 	test("Should return an array of transactions on success", async () => {
