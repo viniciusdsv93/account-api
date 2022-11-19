@@ -71,22 +71,7 @@ describe("Transaction Prisma Repository", () => {
 	};
 
 	test("Should return a transaction on create success", async () => {
-		const { sut, accountSut, userSut } = makeSut();
-		const user1 = await userSut.add({
-			username: "Orlando",
-			password: "Password1",
-		});
-		const debitedAccount = await accountSut.add(user1.id);
-		const user2 = await userSut.add({
-			username: "Mariana",
-			password: "Password2",
-		});
-		const creditedAccount = await accountSut.add(user2.id);
-		const createdTransaction = await sut.create({
-			debitedAccountId: debitedAccount.id,
-			creditedAccountId: creditedAccount.id,
-			value: 45.3,
-		});
+		const { createdTransaction } = await makePreTransaction();
 		expect(createdTransaction).toHaveProperty("id");
 		expect(createdTransaction).toHaveProperty("debitedAccountId");
 		expect(createdTransaction).toHaveProperty("creditedAccountId");
@@ -103,22 +88,7 @@ describe("Transaction Prisma Repository", () => {
 	});
 
 	test("Should return an array of transactions on get success", async () => {
-		const { sut, accountSut, userSut } = makeSut();
-		const user1 = await userSut.add({
-			username: "Orlando",
-			password: "Password1",
-		});
-		const debitedAccount = await accountSut.add(user1.id);
-		const user2 = await userSut.add({
-			username: "Mariana",
-			password: "Password2",
-		});
-		const creditedAccount = await accountSut.add(user2.id);
-		await sut.create({
-			debitedAccountId: debitedAccount.id,
-			creditedAccountId: creditedAccount.id,
-			value: 45.3,
-		});
+		const { sut, debitedAccount } = await makePreTransaction();
 		const result = await sut.get(debitedAccount.id, makeFakeFilters());
 		expect(result).toContainEqual(
 			expect.objectContaining({
@@ -132,22 +102,7 @@ describe("Transaction Prisma Repository", () => {
 	});
 
 	test("Should return only transactions with the informed account as debited when type informed in filters is equal to 'cash-out'", async () => {
-		const { sut, accountSut, userSut } = makeSut();
-		const user1 = await userSut.add({
-			username: "Orlando",
-			password: "Password1",
-		});
-		const debitedAccount = await accountSut.add(user1.id);
-		const user2 = await userSut.add({
-			username: "Mariana",
-			password: "Password2",
-		});
-		const creditedAccount = await accountSut.add(user2.id);
-		await sut.create({
-			debitedAccountId: debitedAccount.id,
-			creditedAccountId: creditedAccount.id,
-			value: 45.3,
-		});
+		const { sut, debitedAccount } = await makePreTransaction();
 		const result = await sut.get(debitedAccount.id, {
 			date: undefined,
 			type: "cash-out",
@@ -164,27 +119,11 @@ describe("Transaction Prisma Repository", () => {
 	});
 
 	test("Should return only transactions with the informed account as credited when type informed in filters is equal to 'cash-in'", async () => {
-		const { sut, accountSut, userSut } = makeSut();
-		const user1 = await userSut.add({
-			username: "Orlando",
-			password: "Password1",
-		});
-		const debitedAccount = await accountSut.add(user1.id);
-		const user2 = await userSut.add({
-			username: "Mariana",
-			password: "Password2",
-		});
-		const creditedAccount = await accountSut.add(user2.id);
-		await sut.create({
-			debitedAccountId: debitedAccount.id,
-			creditedAccountId: creditedAccount.id,
-			value: 45.3,
-		});
+		const { sut, debitedAccount } = await makePreTransaction();
 		const result = await sut.get(debitedAccount.id, {
 			date: undefined,
 			type: "cash-in",
 		});
-
 		expect(result).toEqual([]);
 	});
 });
