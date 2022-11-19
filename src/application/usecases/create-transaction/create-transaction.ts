@@ -76,7 +76,5 @@ export class CreateTransaction implements ICreateTransaction {
 			creditedAccountId: creditedAccount.id,
 			value,
 		});
-
-		return null;
 	}
 }
