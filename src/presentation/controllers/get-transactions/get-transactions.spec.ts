@@ -130,7 +130,10 @@ describe("Get Transactions Controller", () => {
 				authorization: "Bearer any_token",
 			},
 		});
-		expect(getTransactionsSpy).toHaveBeenCalledWith();
+		expect(getTransactionsSpy).toHaveBeenCalledWith({
+			date: undefined,
+			type: undefined,
+		});
 	});
 
 	test("Should return an array of transactions on success", async () => {
@@ -147,4 +150,8 @@ describe("Get Transactions Controller", () => {
 			])
 		);
 	});
+
+	// test error 500
+
+	// test returns unauthorized if get transactions usecase returns null
 });

@@ -36,12 +36,7 @@ export class GetTransactionsController implements Controller {
 			type: httpRequest.query?.type,
 		};
 
-		if (httpRequest.query?.date || httpRequest.query?.type) {
-			const result = await this.getTransactions.execute(filters);
-			return ok(result);
-		} else {
-			const result = await this.getTransactions.execute();
-			return ok(result);
-		}
+		const result = await this.getTransactions.execute(filters);
+		return ok(result);
 	}
 }
