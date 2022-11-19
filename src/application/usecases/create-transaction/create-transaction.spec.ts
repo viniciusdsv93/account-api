@@ -271,4 +271,24 @@ describe("Create Transaction UseCase", () => {
 			value: 15.25,
 		});
 	});
+
+	test("Should return a transaction on CreateTransactionRepository success", async () => {
+		const { sut, findAccountByUserIdRepositoryStub } = makeSut();
+		const randomNumber = Math.random();
+		jest.spyOn(findAccountByUserIdRepositoryStub, "findByUserId").mockReturnValueOnce(
+			new Promise((resolve) =>
+				resolve({
+					id: `valid_account_id_${randomNumber}`,
+					balance: 87.3,
+				})
+			)
+		);
+		const response = await sut.execute(makeFakeTransaction());
+		expect(response).toEqual({
+			id: "transaction_id",
+			debitedAccountId: "debited_account_id",
+			creditedAccountId: "credited_account_id",
+			value: 55.4,
+		});
+	});
 });
