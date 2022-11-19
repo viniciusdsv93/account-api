@@ -84,11 +84,11 @@ describe("Get Account Balance UseCase", () => {
 		expect(payload).toBeNull();
 	});
 
-	// test("Should return an user id on Decrypter success", async () => {
-	// 	const { decrypterStub } = makeSut();
-	// 	const decrypterResponse = await decrypterStub.decrypt("valid_token");
-	// 	expect(decrypterResponse).toHaveProperty("id", "valid_id");
-	// });
+	test("Should return an user id on Decrypter success", async () => {
+		const { decrypterStub } = makeSut();
+		const decrypterResponse = await decrypterStub.decrypt("valid_token");
+		expect(decrypterResponse).toHaveProperty("id", "valid_id");
+	});
 
 	// test("Should call FindAccountByUserIdRepository with the correct user id", async () => {
 	// 	const { sut, findAccountByUserIdRepositoryStub } = makeSut();
