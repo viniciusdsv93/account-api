@@ -1,3 +1,4 @@
+import { GetTransactionsModel } from "../../../../domain/usecases/get-transactions";
 import { AccountPrismaRepository } from "../account-repository/account";
 import { prismaClient } from "../prisma/prisma-client";
 import { UserPrismaRepository } from "../user-respository/user";
@@ -15,6 +16,13 @@ describe("Transaction Prisma Repository", () => {
 		await prismaClient.account.deleteMany();
 		await prismaClient.user.deleteMany();
 	});
+
+	const makeFakeFilters = (): GetTransactionsModel => {
+		return {
+			date: "2022-10-30",
+			type: "cash-out",
+		};
+	};
 
 	type SutTypes = {
 		sut: TransactionPrismaRepository;
@@ -78,5 +86,34 @@ describe("Transaction Prisma Repository", () => {
 		const updatedCreditedAccount = await accountSut.findByUserId(user2.id);
 		expect(updatedCreditedAccount?.balance).toBe(145.3);
 		expect(updatedDebitedAccount?.balance).toBe(54.7);
+	});
+
+	test("Should return an array of transactions on get success", async () => {
+		const { sut, accountSut, userSut } = makeSut();
+		const user1 = await userSut.add({
+			username: "Orlando",
+			password: "Password1",
+		});
+		const debitedAccount = await accountSut.add(user1.id);
+		const user2 = await userSut.add({
+			username: "Mariana",
+			password: "Password2",
+		});
+		const creditedAccount = await accountSut.add(user2.id);
+		await sut.create({
+			debitedAccountId: debitedAccount.id,
+			creditedAccountId: creditedAccount.id,
+			value: 45.3,
+		});
+		const result = await sut.get(debitedAccount.id, makeFakeFilters());
+		expect(result).toContainEqual(
+			expect.objectContaining({
+				createdAt: expect.anything(),
+				creditedAccountId: expect.anything(),
+				debitedAccountId: expect.anything(),
+				id: expect.anything(),
+				value: expect.anything(),
+			})
+		);
 	});
 });
