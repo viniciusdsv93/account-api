@@ -37,11 +37,11 @@ export class GetTransactionsController implements Controller {
 		};
 
 		if (httpRequest.query?.date || httpRequest.query?.type) {
-			await this.getTransactions.execute(filters);
+			const result = await this.getTransactions.execute(filters);
+			return ok(result);
 		} else {
-			await this.getTransactions.execute();
+			const result = await this.getTransactions.execute();
+			return ok(result);
 		}
-
-		return new Promise((resolve) => resolve(ok("")));
 	}
 }
