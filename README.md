@@ -33,10 +33,29 @@ Com o endpoint "/login", utilizando-se o método HTTP POST, o usuário deve forn
 
 Caso os dados estejam corretos, é retornada uma resposta 200 OK, com o "accessToken" gerado via JsonWebToken - JWT, com validade de 24 horas.
 
-<!-- 
+Para consumo das rotas seguintes é preciso inserir o accessToken no header da requisição, em "Authorization: Bearer accessToken".
 
+Dessa forma, um(a) usuário(a) poderá visualizar o saldo de sua conta (balance) apenas se incluir o accessToken no header da requisição, caso em que receberá uma resposta 200 OK com o campo "balance" e a indicação do saldo atual.
 
-Por fim, também foi disponibilizado o endpoint "/results", via método HTTP GET, que retornará a listagem com todos os resultados cadastrados no banco de dados. A lista retornada contém objetos com as seguintes propriedades: id, mathExpression, result, date.  -->
+Com o endpoint "/transaction", pelo método HTTP POST, o(a) usuário(a) também pode realizar uma transferência de sua conta para uma conta de terceiro, sendo para isso necessário que forneça no corpo da requisição o username da conta recebedora ("creditedUsername") e o valor ("value"), além de estar autenticado com o respectivo accessToken fornecido no header da requisição.
+
+Em caso de êxito, o(a) usuário(a) receberá uma resposta 200 OK, com a indicação do ID da transação, a conta pagadora ("debitedAccountId"), a conta recebedora ("creditedAccountId"), o valor e a data da operação ("createdAt").
+
+Neste caso são feitas transações em bloco a fim de garantir que somente se concretizem se todas forem frutíferas, sendo a primeira a criação de um registro na tabela Transactions, a segunda a atualização do saldo da conta pagadora, com a subtração do valor da transação, e a terceira a atualização do saldo da conta recebedora, com a adição deste valor.
+
+Por meio do método "$transaction" do PrismaORM, se garante que, caso uma dessas transações falhe, todas sejam revertidas, garantindo-se a atomicidade da transação e evitando inconsistências.
+
+Por último, há o método HTTP GET, neste mesmo endpoint "/transaction", por onde é possível ao(a) usuário(a), se devidamente autenticado com o accessToken fornecido no header da requisição, obter todas as transações em que estiver envolvida sua conta, seja como pagador ou recebedor.
+
+Em caso de sucesso, é enviada uma resposta 200 OK com um array de transações, sendo que cada uma consiste em um objeto com ID da transação, ID da conta pagadora ("debitedAccountId"), ID da conta recebedora ("creditedAccountId"), valor ("value") e data de operação ("createdAt").
+
+Neste endpoint, é possível ao(a) usuário fornecer query params na URL a fim de possibilitar a filtragem da busca.
+
+É possível fornecer o parâmetro "?date=yyyy-MM-dd" para que sejam retornadas somente as transações realizadas ou recebidas por ele(ela) na data especificada.
+
+Também é possível indicar o parâmetro "?type", que pode ser "cash-in" ou "cash-out", retornando apenas as transações em que o usuário figurar como, respectivamente, recebedor ou pagador.
+
+Os dois parâmetros acima podem ou não ser utilizados em conjunto, sendo sua utilização opcional.
 
 ### Aplicação do TDD (Test-Driven-Development)
 
@@ -48,21 +67,21 @@ Para construção da API foi aplicado o TDD, realizando testes unitários para g
 
 Para estruturação das camadas da API, foram aplicados os princípios da Clean Archtecture desenvolvida por Robert Martin a fim de segregar os componentes em camadas com o intuito de reduzir o acoplamento entre elas.
 
-Na camada mais interna, há o diretório "domain", onde está a modelagem da entidade referente ao resultado a ser persistido no banco de dados ("/domain/models/mathResult.ts"), exportado pela interface MathResultModel.
+Na camada mais interna, há o diretório "domain", onde está a modelagem das entidades de Usuário ("UserModel"), Conta ("AccountModel") e Transação ("TransactionModel").
 
-No mesmo diretório "domain", na subpasta "useCases", há a definição das interfaces dos casos de uso, responsáveis por realizar operações com as entidades na camada de domínio.
+No mesmo diretório "domain", na subpasta "useCases", há a definição das interfaces dos casos de uso, responsáveis por realizar operações com as entidades na camada de domínio, orquestrando a interação entre elas.
 
-Na camada acima, dentro da pasta "data", em "useCases", há a implementação das interfaces dos casos de uso, sendo um para a efetiva realização da operação matemática e sua persistência no banco de dados (realizada pela chamada a um repositório), e outro para a obtenção da listagem de operações persistidas.
+Na camada acima, dentro da pasta "application", em "usecases", há a implementação das interfaces dos casos de uso, divididas em subpastas para cada caso de uso estipulado na camada de domínio, sendo uma para criação de um usuário, outra para autenticação do usuário, outra para obtenção do saldo, outra para criação de uma transação e outra para visualização das transações.
 
-Ainda em "data", há a pasta "protocols", onde estão definidas as interfaces dos repositórios, ou seja, das classes responsáveis pela persistência e manipulação do banco de dados.
+Ainda em "application", há a pasta "protocols", onde estão definidas as interfaces dos repositórios, ou seja, das classes responsáveis pela persistência e manipulação do banco de dados, e também dos serviços de hash e criptografia.
 
-Após a camada de casos de uso, há a camada de "presentation", onde se situam os "controllers", que intermediam as requisições e respostas vindas e encaminhadas ao exterior da aplicação, delegando as operações e retornando uma resposta ao usuário.
+Após a camada de casos de uso, há a camada de "presentation", onde se situam os "controllers", que intermediam as requisições e respostas vindas e encaminhadas ao exterior da aplicação, delegando as operações e retornando uma resposta ao(a) usuário(a).
 
-Nesta camada, há a pasta "presentation", e a subpasta "controllers", onde constam os controladores responsáveis por validar os campos obrigatórios da requisição, caso houver, delegar as atividades aos respectivos casos de uso, e formatar a resposta para o usuário em caso de sucesso ou de falha.
+Nesta camada, há a pasta "presentation", e a subpasta "controllers", onde constam os controladores responsáveis por validar os campos obrigatórios da requisição, caso houver, delegar as atividades aos respectivos casos de uso, e formatar a resposta para o usuário em caso de sucesso ou de falha, além de tratar erros.
 
-Mais externamente, há a camada de "infra", onde se situam os componentes de mais "baixo-nível" da aplicação.
+Mais externamente, há a camada de "infra", referente à infraestrutura, onde se situam os componentes de mais "baixo-nível" da aplicação.
 
-É nesta camada ("/infra/db/mariadb") onde foi implementado o banco de dados MariaDB para implementação das interfaces dos repositórios.
+É nesta camada ("/infra/database/postgres") onde foi implementado o banco de dados PostgreSQL para implementação das interfaces dos repositórios, com o suporte do ORM Prisma.
 
 Por último, há a camada principal ("main"), onde está configurada a aplicação e são instanciadas e injetadas as dependências das implementações das outras camadas.
 
@@ -74,7 +93,7 @@ Nesta camada, é configurada a classe de inicialização da aplicação, utiliza
 
 Os SOLID principles consistem em práticas consolidadas no âmbito da programação orientada a objetos visando a construção de aplicações com menor acoplamento e maior coesão.
 
-No caso desta aplicação, foram aplicados em maior grau os princípios Single Responsability, Liskov Substitution e Dependency Inversion.
+No caso desta aplicação, foram aplicados em maior grau os princípios Single Responsability, Liskov Substitution, Dependency Inversion e Interface Segregation.
 
 O princípio Single Responsability defende que cada classe possua apenas uma razão para ser modificada, ou seja, que possua uma única responsabilidade, e foi com base nisso que se optou por dividir cada funcionalidade da aplicação em um caso de uso distinto.
 
@@ -88,13 +107,17 @@ No caso, as classes dos controllers e useCases possuem dependências, que são i
 
 Dessa forma, é possível alterar a implementação destas interfaces no momento de injetar a dependência sem que isso comprometa a funcionalidade dos componentes de mais alto-nível, já que todas as implementações obrigatoriamente seguirão a definição da interface, reduzindo acoplamento. 
 
+Por conta da divisão em camadas seguindo os princípios da Clean Architecture, as camadas de mais alto-nível não conhecem e nem dependem das implementações das camadas mais externas.
+
+Quanto ao princípio da Interface Segregation, optou-se por particionar as funcionalidades dos repositórios em interfaces individualizadas a fim de facilitar sua testabilidade na realização de testes unitários, além de uma maior flexibilidade no momento de implementar e injetar as implementações como dependências.
+
 ## Execução
 
-Para executar a aplicação localmente, é preciso primeiro iniciar o container docker com a instância do MariaDB, onde são persistidos os dados.
+<!-- Para executar a aplicação localmente, é preciso primeiro iniciar o container docker com a instância do MariaDB, onde são persistidos os dados.
 
 Para isso é preciso, com o docker em funcionamento, executar no terminal o comando "docker run --name calculator-mariadb -p 3306:3306 --env MARIADB_USER=root --env MARIADB_PASSWORD=password --env MARIADB_ROOT_PASSWORD=password --env MARIADB_DATABASE=calculator-mariadb -d mariadb:latest".
 
-Depois, será necessário executar "docker start calculator-mariadb" no terminal para iniciar o container.
+Depois, será necessário executar "docker start calculator-mariadb" no terminal para iniciar o container. -->
 
 Após, é preciso executar "npm install" para instalar todas as dependências da aplicação.
 
