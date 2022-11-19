@@ -148,4 +148,29 @@ describe("Transaction Prisma Repository", () => {
 			})
 		);
 	});
+
+	test("Should return only transactions with the informed account as credited when type informed in filters is equal to 'cash-in'", async () => {
+		const { sut, accountSut, userSut } = makeSut();
+		const user1 = await userSut.add({
+			username: "Orlando",
+			password: "Password1",
+		});
+		const debitedAccount = await accountSut.add(user1.id);
+		const user2 = await userSut.add({
+			username: "Mariana",
+			password: "Password2",
+		});
+		const creditedAccount = await accountSut.add(user2.id);
+		await sut.create({
+			debitedAccountId: debitedAccount.id,
+			creditedAccountId: creditedAccount.id,
+			value: 45.3,
+		});
+		const result = await sut.get(debitedAccount.id, {
+			date: undefined,
+			type: "cash-in",
+		});
+
+		expect(result).toEqual([]);
+	});
 });
