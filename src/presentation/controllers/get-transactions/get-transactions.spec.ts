@@ -153,6 +153,4 @@ describe("Get Transactions Controller", () => {
 			])
 		);
 	});
-
-	// test returns unauthorized if get transactions usecase returns null
 });
