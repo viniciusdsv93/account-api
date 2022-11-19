@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:10-alpine
+    ports:
+      - "5432:5432"
+    container_name: "db-postgres-account-api"
+    environment:
+      POSTGRES_DB: account_management
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "password"
+    volumes:
+      - ./db-postgres-backup:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  db-postgres-backup:
