@@ -2,10 +2,14 @@ import {
 	ICreateTransactionRepository,
 	TransactionData,
 } from "../../../../application/protocols/repositories/transaction/create-transaction-repository";
+import { IGetTransactionsRepository } from "../../../../application/protocols/repositories/transaction/get-transactions-repository";
 import { TransactionModel } from "../../../../domain/models/transaction";
+import { GetTransactionsModel } from "../../../../domain/usecases/get-transactions";
 import { prismaClient } from "../prisma/prisma-client";
 
-export class TransactionPrismaRepository implements ICreateTransactionRepository {
+export class TransactionPrismaRepository
+	implements ICreateTransactionRepository, IGetTransactionsRepository
+{
 	async create(transactionData: TransactionData): Promise<TransactionModel> {
 		const { debitedAccountId, creditedAccountId, value } = transactionData;
 
@@ -54,5 +58,16 @@ export class TransactionPrismaRepository implements ICreateTransactionRepository
 		]);
 
 		return transaction;
+	}
+
+	get(
+		accountId: string,
+		filters: GetTransactionsModel
+	): Promise<TransactionModel[] | null> {
+		return prismaClient.transaction.findMany({
+			where: {
+				debitedAccountId: accountId,
+			},
+		});
 	}
 }
