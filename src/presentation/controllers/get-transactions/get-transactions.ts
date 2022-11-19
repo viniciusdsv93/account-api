@@ -23,6 +23,13 @@ export class GetTransactionsController implements Controller {
 				return badRequest(new InvalidParamError("date", "invalid date format"));
 			}
 		}
+
+		if (httpRequest.query.type) {
+			const type = httpRequest.query.type;
+			if (type !== "cash-in" && type !== "cash-out") {
+				return badRequest(new InvalidParamError("type", "invalid type format"));
+			}
+		}
 		const date = httpRequest.query.date;
 		return new Promise((resolve) => resolve(ok("")));
 	}
