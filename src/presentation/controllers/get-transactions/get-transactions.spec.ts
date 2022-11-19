@@ -95,4 +95,14 @@ describe("Get Transactions Controller", () => {
 			badRequest(new InvalidParamError("type", "invalid type format"))
 		);
 	});
+
+	test("Should call GetTransactionsUsecase with the correct filter values", async () => {
+		const { sut, getTransactionsStub } = makeSut();
+		const getTransactionsSpy = jest.spyOn(getTransactionsStub, "execute");
+		await sut.handle(makeFakeRequest());
+		expect(getTransactionsSpy).toHaveBeenCalledWith({
+			date: "2022-10-30",
+			type: "cash-out",
+		});
+	});
 });
