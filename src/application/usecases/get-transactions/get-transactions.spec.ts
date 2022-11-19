@@ -19,7 +19,10 @@ describe("Get Account Balance UseCase", () => {
 
 	const makeGetTransactionsRepositoryStub = (): IGetTransactionsRepository => {
 		class GetTransactionsRepositoryStub implements IGetTransactionsRepository {
-			async get(filters: GetTransactionsModel): Promise<TransactionModel[] | null> {
+			async get(
+				token: string,
+				filters: GetTransactionsModel
+			): Promise<TransactionModel[] | null> {
 				return new Promise((resolve) =>
 					resolve([
 						{
@@ -90,15 +93,12 @@ describe("Get Account Balance UseCase", () => {
 		expect(decrypterResponse).toHaveProperty("id", "valid_id");
 	});
 
-	// test("Should call FindAccountByUserIdRepository with the correct user id", async () => {
-	// 	const { sut, findAccountByUserIdRepositoryStub } = makeSut();
-	// 	const findAccountSpy = jest.spyOn(
-	// 		findAccountByUserIdRepositoryStub,
-	// 		"findByUserId"
-	// 	);
-	// 	await sut.execute("valid_token");
-	// 	expect(findAccountSpy).toHaveBeenCalledWith("valid_id");
-	// });
+	test("Should call GetTransactionsRepository with the correct values", async () => {
+		const { sut, getTransactionsRepository } = makeSut();
+		const getTransactionsSpy = jest.spyOn(getTransactionsRepository, "get");
+		await sut.execute("valid_token", makeFakeFilters());
+		expect(getTransactionsSpy).toHaveBeenCalledWith("valid_id", makeFakeFilters());
+	});
 
 	// test("Should throw if FindAccountByUserIdRepository throws", async () => {
 	// 	const { sut, findAccountByUserIdRepositoryStub } = makeSut();
