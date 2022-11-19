@@ -10,6 +10,12 @@ describe("Transaction Prisma Repository", () => {
 		await prismaClient.user.deleteMany();
 	});
 
+	afterAll(async () => {
+		await prismaClient.transaction.deleteMany();
+		await prismaClient.account.deleteMany();
+		await prismaClient.user.deleteMany();
+	});
+
 	type SutTypes = {
 		sut: TransactionPrismaRepository;
 		accountSut: AccountPrismaRepository;

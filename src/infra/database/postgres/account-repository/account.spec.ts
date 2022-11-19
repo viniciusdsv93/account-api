@@ -4,16 +4,18 @@ import { AccountPrismaRepository } from "./account";
 
 describe("Account Prisma Repository", () => {
 	beforeEach(async () => {
+		await prismaClient.transaction.deleteMany();
 		await prismaClient.account.deleteMany();
 		await prismaClient.user.deleteMany();
 	});
 
 	afterAll(async () => {
+		await prismaClient.transaction.deleteMany();
 		await prismaClient.account.deleteMany();
 		await prismaClient.user.deleteMany();
 	});
 
-	test("Should return an account on add success", async () => {
+	test("Should return an account on add successs", async () => {
 		const sut = new AccountPrismaRepository();
 		const userSut = new UserPrismaRepository();
 		const user = await userSut.add({
