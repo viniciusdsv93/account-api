@@ -72,6 +72,14 @@ export class TransactionPrismaRepository
 			});
 		}
 
+		if (filters.type === "cash-in") {
+			return prismaClient.transaction.findMany({
+				where: {
+					creditedAccountId: accountId,
+				},
+			});
+		}
+
 		return prismaClient.transaction.findMany({
 			where: {
 				debitedAccountId: accountId,
