@@ -75,14 +75,14 @@ describe("Get Account Balance UseCase", () => {
 		await expect(promise).rejects.toThrow();
 	});
 
-	// test("Should return null if Decrypter returns null", async () => {
-	// 	const { sut, decrypterStub } = makeSut();
-	// 	jest.spyOn(decrypterStub, "decrypt").mockReturnValueOnce(
-	// 		new Promise((resolve) => resolve(null))
-	// 	);
-	// 	const payload = await sut.execute("valid_token");
-	// 	expect(payload).toBeNull();
-	// });
+	test("Should return null if Decrypter returns null", async () => {
+		const { sut, decrypterStub } = makeSut();
+		jest.spyOn(decrypterStub, "decrypt").mockReturnValueOnce(
+			new Promise((resolve) => resolve(null))
+		);
+		const payload = await sut.execute("valid_token", makeFakeFilters());
+		expect(payload).toBeNull();
+	});
 
 	// test("Should return an user id on Decrypter success", async () => {
 	// 	const { decrypterStub } = makeSut();
