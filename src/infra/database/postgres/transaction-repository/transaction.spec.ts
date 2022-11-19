@@ -126,4 +126,21 @@ describe("Transaction Prisma Repository", () => {
 		});
 		expect(result).toEqual([]);
 	});
+
+	test("Should return only transactions of the specified date if a valid date is provided in filters", async () => {
+		const { sut, debitedAccount } = await makePreTransaction();
+		const result = await sut.get(debitedAccount.id, {
+			date: "2022-11-19",
+			type: undefined,
+		});
+		expect(result).toContainEqual(
+			expect.objectContaining({
+				createdAt: expect.anything(),
+				creditedAccountId: expect.anything(),
+				debitedAccountId: expect.anything(),
+				id: expect.anything(),
+				value: expect.anything(),
+			})
+		);
+	});
 });
