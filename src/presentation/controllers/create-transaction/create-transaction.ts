@@ -28,12 +28,17 @@ export class CreateTransactionController implements Controller {
 
 			const token = httpRequest.headers.authorization.split(" ")[1];
 
-			await this.createTransaction.execute({
+			const transactionCreated = await this.createTransaction.execute({
 				token: token,
 				creditedUsername,
 				value,
 			});
 
+			if (!transactionCreated) {
+				return unauthorized();
+			}
+
+			// TODO handle error responses
 			return new Promise((resolve) => resolve(ok("")));
 		} catch (error) {
 			return serverError(error as Error);
