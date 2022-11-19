@@ -82,7 +82,14 @@ export class TransactionPrismaRepository
 
 		return prismaClient.transaction.findMany({
 			where: {
-				debitedAccountId: accountId,
+				OR: [
+					{
+						debitedAccountId: accountId,
+					},
+					{
+						creditedAccountId: accountId,
+					},
+				],
 			},
 		});
 	}
