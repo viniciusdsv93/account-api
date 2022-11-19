@@ -6,5 +6,8 @@ export type GetTransactionsModel = {
 };
 
 export interface IGetTransactions {
-	execute(filters: GetTransactionsModel): Promise<TransactionModel[] | null>;
+	execute(
+		token: string,
+		filters: GetTransactionsModel
+	): Promise<TransactionModel[] | null>;
 }

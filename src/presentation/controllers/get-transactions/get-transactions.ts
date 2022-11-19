@@ -18,6 +18,8 @@ export class GetTransactionsController implements Controller {
 				return badRequest(new MissingParamError("token"));
 			}
 
+			const token = httpRequest.headers.authorization.split(" ")[1];
+
 			if (httpRequest.query?.date) {
 				const date = httpRequest.query.date;
 				if (new Date(date).toString() === "Invalid Date") {
@@ -41,7 +43,7 @@ export class GetTransactionsController implements Controller {
 				type: httpRequest.query?.type,
 			};
 
-			const result = await this.getTransactions.execute(filters);
+			const result = await this.getTransactions.execute(token, filters);
 
 			if (!result) {
 				return unauthorized();

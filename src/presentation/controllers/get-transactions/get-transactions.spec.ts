@@ -12,7 +12,8 @@ import { GetTransactionsController } from "./get-transactions";
 const makeGetTransactionsStub = (): IGetTransactions => {
 	class GetTransactionsStub implements IGetTransactions {
 		async execute(
-			filters?: GetTransactionsModel | undefined
+			token: string,
+			filters: GetTransactionsModel
 		): Promise<TransactionModel[]> {
 			return new Promise((resolve) =>
 				resolve([
@@ -100,29 +101,13 @@ describe("Get Transactions Controller", () => {
 		const { sut, getTransactionsStub } = makeSut();
 		const getTransactionsSpy = jest.spyOn(getTransactionsStub, "execute");
 		await sut.handle(makeFakeRequest());
-		expect(getTransactionsSpy).toHaveBeenCalledWith({
+		expect(getTransactionsSpy).toHaveBeenCalledWith("any_token", {
 			date: "2022-10-30",
 			type: "cash-out",
 		});
 	});
 
-	test("Should call GetTransactionsUsecase only with the provided filter values", async () => {
-		const { sut, getTransactionsStub } = makeSut();
-		const getTransactionsSpy = jest.spyOn(getTransactionsStub, "execute");
-		await sut.handle({
-			headers: {
-				authorization: "Bearer any_token",
-			},
-			query: {
-				date: "2022-10-30",
-			},
-		});
-		expect(getTransactionsSpy).toHaveBeenCalledWith({
-			date: "2022-10-30",
-		});
-	});
-
-	test("Should call GetTransactionsUsecase with no arguments when no filters are provided", async () => {
+	test("Should call GetTransactionsUsecase with undefined filters when no filters are provided", async () => {
 		const { sut, getTransactionsStub } = makeSut();
 		const getTransactionsSpy = jest.spyOn(getTransactionsStub, "execute");
 		await sut.handle({
@@ -130,7 +115,7 @@ describe("Get Transactions Controller", () => {
 				authorization: "Bearer any_token",
 			},
 		});
-		expect(getTransactionsSpy).toHaveBeenCalledWith({
+		expect(getTransactionsSpy).toHaveBeenCalledWith("any_token", {
 			date: undefined,
 			type: undefined,
 		});
