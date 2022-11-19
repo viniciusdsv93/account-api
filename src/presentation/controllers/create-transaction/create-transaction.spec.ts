@@ -93,7 +93,7 @@ describe("Create Transaction Controller", () => {
 		expect(httpResponse).toEqual(unauthorized());
 	});
 
-	test("Should call CreateTransactionUseCase with correct values", async () => {
+	test("Should call CreateTransaction with correct values", async () => {
 		const { sut, createTransactionStub } = makeSut();
 		const createTransactionSpy = jest.spyOn(createTransactionStub, "execute");
 		await sut.handle(makeFakeRequest());
@@ -104,12 +104,21 @@ describe("Create Transaction Controller", () => {
 		});
 	});
 
-	test("Should return 500 if Authentication throws", async () => {
+	test("Should return 500 if CreateTransaction throws", async () => {
 		const { sut, createTransactionStub } = makeSut();
 		jest.spyOn(createTransactionStub, "execute").mockReturnValueOnce(
 			new Promise((resolve, reject) => reject(new Error()))
 		);
 		const httpResponse = await sut.handle(makeFakeRequest());
 		expect(httpResponse).toEqual(serverError(new Error()));
+	});
+
+	test("Should return 401 if CreateTransaction fails", async () => {
+		const { sut, createTransactionStub } = makeSut();
+		jest.spyOn(createTransactionStub, "execute").mockReturnValueOnce(
+			new Promise((resolve) => resolve(null))
+		);
+		const httpResponse = await sut.handle(makeFakeRequest());
+		expect(httpResponse).toEqual(unauthorized());
 	});
 });
