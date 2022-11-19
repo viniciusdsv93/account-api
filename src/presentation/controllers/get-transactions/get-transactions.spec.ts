@@ -121,4 +121,15 @@ describe("Get Transactions Controller", () => {
 			date: "2022-10-30",
 		});
 	});
+
+	test("Should call GetTransactionsUsecase with no arguments when no filters are provided", async () => {
+		const { sut, getTransactionsStub } = makeSut();
+		const getTransactionsSpy = jest.spyOn(getTransactionsStub, "execute");
+		await sut.handle({
+			headers: {
+				authorization: "Bearer any_token",
+			},
+		});
+		expect(getTransactionsSpy).toHaveBeenCalledWith();
+	});
 });
