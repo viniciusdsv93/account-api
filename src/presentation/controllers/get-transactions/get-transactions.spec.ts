@@ -79,4 +79,20 @@ describe("Get Transactions Controller", () => {
 			badRequest(new InvalidParamError("date", "invalid date format"))
 		);
 	});
+
+	test("Should return 400 if invalid type filter is provided", async () => {
+		const { sut } = makeSut();
+		const httpResponse = await sut.handle({
+			headers: {
+				authorization: "Bearer any_token",
+			},
+			query: {
+				date: "2022-10-30",
+				type: "cashout",
+			},
+		});
+		expect(httpResponse).toEqual(
+			badRequest(new InvalidParamError("type", "invalid type format"))
+		);
+	});
 });
