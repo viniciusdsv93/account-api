@@ -8,7 +8,8 @@ import { prismaClient } from "../prisma/prisma-client";
 export class TransactionPrismaRepository implements ICreateTransactionRepository {
 	async create(transactionData: TransactionData): Promise<TransactionModel> {
 		const { debitedAccountId, creditedAccountId, value } = transactionData;
-		return await prismaClient.transaction.create({
+
+		const createTransaction = prismaClient.transaction.create({
 			data: {
 				creditedAccount: {
 					connect: {
@@ -23,5 +24,35 @@ export class TransactionPrismaRepository implements ICreateTransactionRepository
 				value,
 			},
 		});
+
+		const updateDebitedAccountBalance = prismaClient.account.update({
+			where: {
+				id: debitedAccountId,
+			},
+			data: {
+				balance: {
+					decrement: value,
+				},
+			},
+		});
+
+		const updateCreditedAccountBalance = prismaClient.account.update({
+			where: {
+				id: creditedAccountId,
+			},
+			data: {
+				balance: {
+					increment: value,
+				},
+			},
+		});
+
+		const [transaction] = await prismaClient.$transaction([
+			createTransaction,
+			updateDebitedAccountBalance,
+			updateCreditedAccountBalance,
+		]);
+
+		return transaction;
 	}
 }
