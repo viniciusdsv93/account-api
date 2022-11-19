@@ -1,7 +1,7 @@
 import { IGetTransactions } from "../../../domain/usecases/get-transactions";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
-import { badRequest, ok, serverError } from "../../helpers/http";
+import { badRequest, ok, serverError, unauthorized } from "../../helpers/http";
 import { Controller } from "../../protocols/controller";
 import { HttpRequest, HttpResponse } from "../../protocols/http";
 
@@ -42,6 +42,11 @@ export class GetTransactionsController implements Controller {
 			};
 
 			const result = await this.getTransactions.execute(filters);
+
+			if (!result) {
+				return unauthorized();
+			}
+
 			return ok(result);
 		} catch (error) {
 			return serverError(error as Error);
