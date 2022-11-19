@@ -1,4 +1,4 @@
-import { TransactionModel } from "../models/transaction";
+import { HttpResponse } from "../../presentation/protocols/http";
 
 export type CreateTransactionModel = {
 	token: string;
@@ -7,5 +7,5 @@ export type CreateTransactionModel = {
 };
 
 export interface ICreateTransaction {
-	execute(transactionData: CreateTransactionModel): Promise<TransactionModel | null>;
+	execute(transactionData: CreateTransactionModel): Promise<HttpResponse>;
 }

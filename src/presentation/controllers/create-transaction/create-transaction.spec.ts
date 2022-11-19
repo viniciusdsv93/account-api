@@ -1,11 +1,10 @@
-import { TransactionModel } from "../../../domain/models/transaction";
 import {
 	CreateTransactionModel,
 	ICreateTransaction,
 } from "../../../domain/usecases/create-transaction";
 import { MissingParamError } from "../../errors/missing-param-error";
 import { badRequest, ok, serverError, unauthorized } from "../../helpers/http";
-import { HttpRequest } from "../../protocols/http";
+import { HttpRequest, HttpResponse } from "../../protocols/http";
 import { CreateTransactionController } from "./create-transaction";
 
 describe("Create Transaction Controller", () => {
@@ -13,14 +12,16 @@ describe("Create Transaction Controller", () => {
 		class CreateTransactionStub implements ICreateTransaction {
 			async execute(
 				transactionData: CreateTransactionModel
-			): Promise<TransactionModel> {
+			): Promise<HttpResponse> {
 				return new Promise((resolve) =>
-					resolve({
-						id: "valid_transaction_id",
-						debitedAccountId: "valid_debited_account_id",
-						creditedAccountId: "valid_credited_account_id",
-						value: 99,
-					})
+					resolve(
+						ok({
+							id: "valid_transaction_id",
+							debitedAccountId: "valid_debited_account_id",
+							creditedAccountId: "valid_credited_account_id",
+							value: 99,
+						})
+					)
 				);
 			}
 		}
@@ -111,20 +112,5 @@ describe("Create Transaction Controller", () => {
 		);
 		const httpResponse = await sut.handle(makeFakeRequest());
 		expect(httpResponse).toEqual(serverError(new Error()));
-	});
-
-	test("Should return 401 if CreateTransaction fails", async () => {
-		const { sut, createTransactionStub } = makeSut();
-		jest.spyOn(createTransactionStub, "execute").mockReturnValueOnce(
-			new Promise((resolve) => resolve(null))
-		);
-		const httpResponse = await sut.handle(makeFakeRequest());
-		expect(httpResponse).toEqual(unauthorized());
-	});
-
-	test("Should return no content on CreateTransaction success", async () => {
-		const { sut } = makeSut();
-		const httpResponse = await sut.handle(makeFakeRequest());
-		expect(httpResponse).toEqual(ok({ transactionId: "valid_transaction_id" }));
 	});
 });

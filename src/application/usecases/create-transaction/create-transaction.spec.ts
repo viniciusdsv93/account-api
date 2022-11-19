@@ -4,6 +4,8 @@ import { AccountModel } from "../../../domain/models/account";
 import { TransactionModel } from "../../../domain/models/transaction";
 import { UserModel } from "../../../domain/models/user";
 import { ICreateTransaction } from "../../../domain/usecases/create-transaction";
+import { InvalidParamError } from "../../../presentation/errors/invalid-param-error";
+import { badRequest, ok, unauthorized } from "../../../presentation/helpers/http";
 import { IDecrypter } from "../../protocols/cryptography/decrypter";
 import { IFindAccountByUserIdRepository } from "../../protocols/repositories/account/find-account-by-user-id-repository";
 import {
@@ -123,13 +125,13 @@ describe("Create Transaction UseCase", () => {
 		await expect(promise).rejects.toThrow();
 	});
 
-	test("Should return null if Decrypter returns null", async () => {
+	test("Should return unauthorized if Decrypter returns null", async () => {
 		const { sut, decrypterStub } = makeSut();
 		jest.spyOn(decrypterStub, "decrypt").mockReturnValueOnce(
 			new Promise((resolve) => resolve(null))
 		);
-		const payload = await sut.execute(makeFakeTransaction());
-		expect(payload).toBeNull();
+		const response = await sut.execute(makeFakeTransaction());
+		expect(response).toEqual(unauthorized());
 	});
 
 	test("Should return an user id on Decrypter success", async () => {
@@ -157,13 +159,13 @@ describe("Create Transaction UseCase", () => {
 		await expect(promise).rejects.toThrow();
 	});
 
-	test("Should return null if FindAccountByUserIdRepository returns null", async () => {
+	test("Should return unauthorized if FindAccountByUserIdRepository returns null", async () => {
 		const { sut, findAccountByUserIdRepositoryStub } = makeSut();
 		jest.spyOn(findAccountByUserIdRepositoryStub, "findByUserId").mockReturnValueOnce(
 			new Promise((resolve) => resolve(null))
 		);
 		const response = await sut.execute(makeFakeTransaction());
-		expect(response).toBeNull();
+		expect(response).toEqual(unauthorized());
 	});
 
 	test("Should return an account on FindAccountByUserIdRepository success", async () => {
@@ -194,14 +196,21 @@ describe("Create Transaction UseCase", () => {
 		await expect(promise).rejects.toThrow();
 	});
 
-	test("Should return null if FindUserByUsernameRepository returns null", async () => {
+	test("Should return badRequest if FindUserByUsernameRepository returns null", async () => {
 		const { sut, findUserByUsernameRepositoryStub } = makeSut();
 		jest.spyOn(
 			findUserByUsernameRepositoryStub,
 			"findByUsername"
 		).mockReturnValueOnce(new Promise((resolve) => resolve(null)));
 		const response = await sut.execute(makeFakeTransaction());
-		expect(response).toBeNull();
+		expect(response).toEqual(
+			badRequest(
+				new InvalidParamError(
+					"creditedUsername",
+					"invalid username for receiver account"
+				)
+			)
+		);
 	});
 
 	test("Should return an user on FindUserByUsernameRepository success", async () => {
@@ -214,13 +223,20 @@ describe("Create Transaction UseCase", () => {
 		expect(findUserRepositoryResponse).toHaveProperty("accountId");
 	});
 
-	test("Should return null if debited account id is equal to credited account id", async () => {
+	test("Should return badRequest if debited account id is equal to credited account id", async () => {
 		const { sut } = makeSut();
 		const response = await sut.execute(makeFakeTransaction());
-		expect(response).toBeNull();
+		expect(response).toEqual(
+			badRequest(
+				new InvalidParamError(
+					"creditedUsername",
+					"receiver and sender account must be different"
+				)
+			)
+		);
 	});
 
-	test("Should return null if value is higher than debited account's balance", async () => {
+	test("Should return badRequest if value is higher than debited account's balance", async () => {
 		const { sut, findAccountByUserIdRepositoryStub } = makeSut();
 		jest.spyOn(findAccountByUserIdRepositoryStub, "findByUserId").mockReturnValueOnce(
 			new Promise((resolve) =>
@@ -231,7 +247,11 @@ describe("Create Transaction UseCase", () => {
 			)
 		);
 		const response = await sut.execute(makeFakeTransaction());
-		expect(response).toBeNull();
+		expect(response).toEqual(
+			badRequest(
+				new InvalidParamError("value", "insufficient balance for this operation")
+			)
+		);
 	});
 
 	test("Should call CreateTransactionRepository with the correct values", async () => {
@@ -261,7 +281,7 @@ describe("Create Transaction UseCase", () => {
 		});
 	});
 
-	test("Should return a transaction on CreateTransactionRepository success", async () => {
+	test("Should return ok with a transaction on CreateTransactionRepository success", async () => {
 		const { sut, findAccountByUserIdRepositoryStub } = makeSut();
 		const randomNumber = Math.random();
 		jest.spyOn(findAccountByUserIdRepositoryStub, "findByUserId").mockReturnValueOnce(
@@ -273,11 +293,13 @@ describe("Create Transaction UseCase", () => {
 			)
 		);
 		const response = await sut.execute(makeFakeTransaction());
-		expect(response).toEqual({
-			id: "transaction_id",
-			debitedAccountId: "debited_account_id",
-			creditedAccountId: "credited_account_id",
-			value: 55.4,
-		});
+		expect(response).toEqual(
+			ok({
+				id: "transaction_id",
+				debitedAccountId: "debited_account_id",
+				creditedAccountId: "credited_account_id",
+				value: 55.4,
+			})
+		);
 	});
 });

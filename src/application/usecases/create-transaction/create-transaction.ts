@@ -3,6 +3,14 @@ import {
 	CreateTransactionModel,
 	ICreateTransaction,
 } from "../../../domain/usecases/create-transaction";
+import { InvalidParamError } from "../../../presentation/errors/invalid-param-error";
+import {
+	badRequest,
+	ok,
+	serverError,
+	unauthorized,
+} from "../../../presentation/helpers/http";
+import { HttpResponse } from "../../../presentation/protocols/http";
 import { IDecrypter } from "../../protocols/cryptography/decrypter";
 import { IFindAccountByUserIdRepository } from "../../protocols/repositories/account/find-account-by-user-id-repository";
 import { ICreateTransactionRepository } from "../../protocols/repositories/transaction/create-transaction-repository";
@@ -26,9 +34,7 @@ export class CreateTransaction implements ICreateTransaction {
 		this.createTransactionRepository = createTransactionRepository;
 	}
 
-	async execute(
-		transactionData: CreateTransactionModel
-	): Promise<TransactionModel | null> {
+	async execute(transactionData: CreateTransactionModel): Promise<HttpResponse> {
 		let debitedAccount = null;
 		let creditedAccount = null;
 
@@ -37,14 +43,14 @@ export class CreateTransaction implements ICreateTransaction {
 		const payload = await this.decrypter.decrypt(token);
 
 		if (!payload) {
-			return null;
+			return unauthorized();
 		}
 
 		const { id } = payload;
 		debitedAccount = await this.findAccountByUserIdRepository.findByUserId(id);
 
 		if (!debitedAccount) {
-			return null;
+			return unauthorized();
 		}
 
 		const creditedUser = await this.findUserByUsernameRepository.findByUsername(
@@ -52,7 +58,12 @@ export class CreateTransaction implements ICreateTransaction {
 		);
 
 		if (!creditedUser) {
-			return null;
+			return badRequest(
+				new InvalidParamError(
+					"creditedUsername",
+					"invalid username for receiver account"
+				)
+			);
 		}
 
 		creditedAccount = await this.findAccountByUserIdRepository.findByUserId(
@@ -60,21 +71,43 @@ export class CreateTransaction implements ICreateTransaction {
 		);
 
 		if (!creditedAccount) {
-			return null;
+			return badRequest(
+				new InvalidParamError(
+					"creditedUsername",
+					"invalid username for receiver account"
+				)
+			);
 		}
 
 		if (debitedAccount.id === creditedAccount.id) {
-			return null;
+			return badRequest(
+				new InvalidParamError(
+					"creditedUsername",
+					"receiver and sender account must be different"
+				)
+			);
 		}
 
 		if (value > debitedAccount.balance) {
-			return null;
+			return badRequest(
+				new InvalidParamError("value", "insufficient balance for this operation")
+			);
 		}
 
-		return await this.createTransactionRepository.create({
+		const createdTransaction = await this.createTransactionRepository.create({
 			debitedAccountId: debitedAccount.id,
 			creditedAccountId: creditedAccount.id,
 			value,
 		});
+
+		if (!createdTransaction) {
+			return serverError(
+				new Error(
+					"Error when trying to process the transaction. Please, try again later"
+				)
+			);
+		}
+
+		return ok(createdTransaction);
 	}
 }
