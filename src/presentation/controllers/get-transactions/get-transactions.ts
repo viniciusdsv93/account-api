@@ -30,7 +30,13 @@ export class GetTransactionsController implements Controller {
 				return badRequest(new InvalidParamError("type", "invalid type format"));
 			}
 		}
-		const date = httpRequest.query.date;
+		const filters = {
+			date: httpRequest.query.date,
+			type: httpRequest.query.type,
+		};
+
+		await this.getTransactions.execute(filters);
+
 		return new Promise((resolve) => resolve(ok("")));
 	}
 }
