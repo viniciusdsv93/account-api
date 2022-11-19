@@ -19,8 +19,8 @@ describe("Transaction Prisma Repository", () => {
 
 	const makeFakeFilters = (): GetTransactionsModel => {
 		return {
-			date: "2022-10-30",
-			type: "cash-out",
+			date: undefined,
+			type: undefined,
 		};
 	};
 
@@ -111,6 +111,38 @@ describe("Transaction Prisma Repository", () => {
 				createdAt: expect.anything(),
 				creditedAccountId: expect.anything(),
 				debitedAccountId: expect.anything(),
+				id: expect.anything(),
+				value: expect.anything(),
+			})
+		);
+	});
+
+	test("Should return only transactions with the informed account as debited when type informed in filters is equal to 'cash-out'", async () => {
+		const { sut, accountSut, userSut } = makeSut();
+		const user1 = await userSut.add({
+			username: "Orlando",
+			password: "Password1",
+		});
+		const debitedAccount = await accountSut.add(user1.id);
+		const user2 = await userSut.add({
+			username: "Mariana",
+			password: "Password2",
+		});
+		const creditedAccount = await accountSut.add(user2.id);
+		await sut.create({
+			debitedAccountId: debitedAccount.id,
+			creditedAccountId: creditedAccount.id,
+			value: 45.3,
+		});
+		const result = await sut.get(debitedAccount.id, {
+			date: undefined,
+			type: "cash-out",
+		});
+		expect(result).toContainEqual(
+			expect.objectContaining({
+				createdAt: expect.anything(),
+				creditedAccountId: expect.anything(),
+				debitedAccountId: debitedAccount.id,
 				id: expect.anything(),
 				value: expect.anything(),
 			})
