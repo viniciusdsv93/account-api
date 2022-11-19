@@ -38,8 +38,7 @@ export class CreateTransactionController implements Controller {
 				return unauthorized();
 			}
 
-			// TODO handle error responses
-			return new Promise((resolve) => resolve(ok("")));
+			return ok({ transactionId: transactionCreated.id });
 		} catch (error) {
 			return serverError(error as Error);
 		}
