@@ -13,17 +13,6 @@ import {
 import { IFindUserByUsernameRepository } from "../../protocols/repositories/user/find-user-by-username-repository";
 import { CreateTransaction } from "./create-transaction";
 
-//verify token
-//get debited account's userId by token
-
-// check if credited and debited accounts are from different people
-
-//get credited acount's userId by username
-
-// check if value is lower than balance
-
-// call repositories
-
 describe("Create Transaction UseCase", () => {
 	const makeDecrypterStub = (): IDecrypter => {
 		class DecrypterStub implements IDecrypter {
