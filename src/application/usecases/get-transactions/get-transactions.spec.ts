@@ -118,13 +118,24 @@ describe("Get Account Balance UseCase", () => {
 		expect(response).toBeNull();
 	});
 
-	// test("Should return an account on FindAccountByUserIdRepository success", async () => {
-	// 	const { findAccountByUserIdRepositoryStub } = makeSut();
-	// 	const findAccountRepositoryResponse =
-	// 		await findAccountByUserIdRepositoryStub.findByUserId("valid_id");
-	// 	expect(findAccountRepositoryResponse).toHaveProperty("id");
-	// 	expect(findAccountRepositoryResponse).toHaveProperty("balance");
-	// });
+	test("Should return an array of transactions on GetTransactionsRepository success", async () => {
+		const { getTransactionsRepository } = makeSut();
+		const getTransactionsRepositoryResponse = await getTransactionsRepository.get(
+			"valid_id",
+			makeFakeFilters()
+		);
+		const expected = [
+			{
+				creditedAccountId: "credited_account_id",
+				debitedAccountId: "debited_account_id",
+				id: "transction_id",
+				value: 77.5,
+			},
+		];
+		expect(getTransactionsRepositoryResponse).toEqual(
+			expect.arrayContaining(expected)
+		);
+	});
 
 	// test("Should return an account's balance on success", async () => {
 	// 	const { sut } = makeSut();
