@@ -225,6 +225,20 @@ describe("Create Transaction UseCase", () => {
 		expect(findUserRepositoryResponse).toHaveProperty("accountId");
 	});
 
+	test("Should return null if value is higher than debited account's balance", async () => {
+		const { sut, findAccountByUserIdRepositoryStub } = makeSut();
+		jest.spyOn(findAccountByUserIdRepositoryStub, "findByUserId").mockReturnValueOnce(
+			new Promise((resolve) =>
+				resolve({
+					id: "valid_id",
+					balance: 5,
+				})
+			)
+		);
+		const response = await sut.execute(makeFakeTransaction());
+		expect(response).toBeNull();
+	});
+
 	test("Should call CreateTransactionRepository with the correct values", async () => {
 		const {
 			sut,
