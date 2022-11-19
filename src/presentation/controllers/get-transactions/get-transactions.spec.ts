@@ -105,4 +105,20 @@ describe("Get Transactions Controller", () => {
 			type: "cash-out",
 		});
 	});
+
+	test("Should call GetTransactionsUsecase only with the provided filter values", async () => {
+		const { sut, getTransactionsStub } = makeSut();
+		const getTransactionsSpy = jest.spyOn(getTransactionsStub, "execute");
+		await sut.handle({
+			headers: {
+				authorization: "Bearer any_token",
+			},
+			query: {
+				date: "2022-10-30",
+			},
+		});
+		expect(getTransactionsSpy).toHaveBeenCalledWith({
+			date: "2022-10-30",
+		});
+	});
 });
