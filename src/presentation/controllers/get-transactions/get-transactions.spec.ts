@@ -5,7 +5,7 @@ import {
 } from "../../../domain/usecases/get-transactions";
 import { InvalidParamError } from "../../errors/invalid-param-error";
 import { MissingParamError } from "../../errors/missing-param-error";
-import { badRequest } from "../../helpers/http";
+import { badRequest, ok } from "../../helpers/http";
 import { HttpRequest } from "../../protocols/http";
 import { GetTransactionsController } from "./get-transactions";
 
@@ -131,5 +131,20 @@ describe("Get Transactions Controller", () => {
 			},
 		});
 		expect(getTransactionsSpy).toHaveBeenCalledWith();
+	});
+
+	test("Should return an array of transactions on success", async () => {
+		const { sut } = makeSut();
+		const httpResponse = await sut.handle(makeFakeRequest());
+		expect(httpResponse).toEqual(
+			ok([
+				{
+					id: "transaction_id",
+					debitedAccountId: "debited_account_id",
+					creditedAccountId: "credited_account_id",
+					value: 55.4,
+				},
+			])
+		);
 	});
 });
