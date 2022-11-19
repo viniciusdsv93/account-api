@@ -66,9 +66,21 @@ export class TransactionPrismaRepository
 	): Promise<TransactionModel[] | null> {
 		if (filters.type === "cash-out") {
 			if (filters.date) {
+				const date = new Date(filters.date);
+				date.setDate(date.getDate() + 1);
 				return prismaClient.transaction.findMany({
 					where: {
-						debitedAccountId: accountId,
+						AND: [
+							{
+								debitedAccountId: accountId,
+							},
+							{
+								createdAt: {
+									gte: new Date(filters.date),
+									lt: date,
+								},
+							},
+						],
 					},
 				});
 			} else {
@@ -81,11 +93,31 @@ export class TransactionPrismaRepository
 		}
 
 		if (filters.type === "cash-in") {
-			return prismaClient.transaction.findMany({
-				where: {
-					creditedAccountId: accountId,
-				},
-			});
+			if (filters.date) {
+				const date = new Date(filters.date);
+				date.setDate(date.getDate() + 1);
+				return prismaClient.transaction.findMany({
+					where: {
+						AND: [
+							{
+								creditedAccountId: accountId,
+							},
+							{
+								createdAt: {
+									gte: new Date(filters.date),
+									lt: date,
+								},
+							},
+						],
+					},
+				});
+			} else {
+				return prismaClient.transaction.findMany({
+					where: {
+						creditedAccountId: accountId,
+					},
+				});
+			}
 		}
 
 		if (filters.date) {
