@@ -1,9 +1,11 @@
+import { AccountModel } from "../../../domain/models/account";
 import { TransactionModel } from "../../../domain/models/transaction";
 import {
 	GetTransactionsModel,
 	IGetTransactions,
 } from "../../../domain/usecases/get-transactions";
 import { IDecrypter } from "../../protocols/cryptography/decrypter";
+import { IFindAccountByUserIdRepository } from "../../protocols/repositories/account/find-account-by-user-id-repository";
 import { IGetTransactionsRepository } from "../../protocols/repositories/transaction/get-transactions-repository";
 import { GetTransactions } from "./get-transactions";
 
@@ -17,10 +19,21 @@ describe("Get Account Balance UseCase", () => {
 		return new DecrypterStub();
 	};
 
+	const makeFindAccountByUserIdRepositoryStub = (): IFindAccountByUserIdRepository => {
+		class FindAccountByUserIdRepositoryStub
+			implements IFindAccountByUserIdRepository
+		{
+			async findByUserId(userId: string): Promise<AccountModel | null> {
+				return new Promise((resolve) => resolve(makeFakeAccount()));
+			}
+		}
+		return new FindAccountByUserIdRepositoryStub();
+	};
+
 	const makeGetTransactionsRepositoryStub = (): IGetTransactionsRepository => {
 		class GetTransactionsRepositoryStub implements IGetTransactionsRepository {
 			async get(
-				token: string,
+				accountId: string,
 				filters: GetTransactionsModel
 			): Promise<TransactionModel[] | null> {
 				return new Promise((resolve) =>
@@ -38,20 +51,10 @@ describe("Get Account Balance UseCase", () => {
 		return new GetTransactionsRepositoryStub();
 	};
 
-	type SutTypes = {
-		sut: IGetTransactions;
-		decrypterStub: IDecrypter;
-		getTransactionsRepository: IGetTransactionsRepository;
-	};
-
-	const makeSut = (): SutTypes => {
-		const decrypterStub = makeDecrypterStub();
-		const getTransactionsRepository = makeGetTransactionsRepositoryStub();
-		const sut = new GetTransactions(decrypterStub, getTransactionsRepository);
+	const makeFakeAccount = (): AccountModel => {
 		return {
-			sut,
-			decrypterStub,
-			getTransactionsRepository,
+			id: "valid_account_id",
+			balance: 99.5,
 		};
 	};
 
@@ -59,6 +62,30 @@ describe("Get Account Balance UseCase", () => {
 		return {
 			date: "2022-10-30",
 			type: "cash-out",
+		};
+	};
+
+	type SutTypes = {
+		sut: IGetTransactions;
+		decrypterStub: IDecrypter;
+		findAccountByUserIdRepositoryStub: IFindAccountByUserIdRepository;
+		getTransactionsRepository: IGetTransactionsRepository;
+	};
+
+	const makeSut = (): SutTypes => {
+		const decrypterStub = makeDecrypterStub();
+		const findAccountByUserIdRepositoryStub = makeFindAccountByUserIdRepositoryStub();
+		const getTransactionsRepository = makeGetTransactionsRepositoryStub();
+		const sut = new GetTransactions(
+			decrypterStub,
+			findAccountByUserIdRepositoryStub,
+			getTransactionsRepository
+		);
+		return {
+			sut,
+			decrypterStub,
+			findAccountByUserIdRepositoryStub,
+			getTransactionsRepository,
 		};
 	};
 
@@ -93,11 +120,24 @@ describe("Get Account Balance UseCase", () => {
 		expect(decrypterResponse).toHaveProperty("id", "valid_id");
 	});
 
+	test("Should call FindAccountByUserIdRepository with the correct user id", async () => {
+		const { sut, findAccountByUserIdRepositoryStub } = makeSut();
+		const findAccountSpy = jest.spyOn(
+			findAccountByUserIdRepositoryStub,
+			"findByUserId"
+		);
+		await sut.execute("valid_token", makeFakeFilters());
+		expect(findAccountSpy).toHaveBeenCalledWith("valid_id");
+	});
+
 	test("Should call GetTransactionsRepository with the correct values", async () => {
 		const { sut, getTransactionsRepository } = makeSut();
 		const getTransactionsSpy = jest.spyOn(getTransactionsRepository, "get");
 		await sut.execute("valid_token", makeFakeFilters());
-		expect(getTransactionsSpy).toHaveBeenCalledWith("valid_id", makeFakeFilters());
+		expect(getTransactionsSpy).toHaveBeenCalledWith(
+			"valid_account_id",
+			makeFakeFilters()
+		);
 	});
 
 	test("Should throw if GetTransactionsRepository throws", async () => {
