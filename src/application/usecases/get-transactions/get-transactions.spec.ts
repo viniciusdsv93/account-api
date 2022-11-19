@@ -137,9 +137,17 @@ describe("Get Account Balance UseCase", () => {
 		);
 	});
 
-	// test("Should return an account's balance on success", async () => {
-	// 	const { sut } = makeSut();
-	// 	const response = await sut.execute("valid_token");
-	// 	expect(response).toEqual(99.5);
-	// });
+	test("Should return an array of transactions on success", async () => {
+		const { sut } = makeSut();
+		const response = await sut.execute("valid_token", makeFakeFilters());
+		const expected = [
+			{
+				creditedAccountId: "credited_account_id",
+				debitedAccountId: "debited_account_id",
+				id: "transction_id",
+				value: 77.5,
+			},
+		];
+		expect(response).toEqual(expect.arrayContaining(expected));
+	});
 });

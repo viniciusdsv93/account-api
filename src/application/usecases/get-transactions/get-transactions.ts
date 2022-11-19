@@ -26,7 +26,10 @@ export class GetTransactions implements IGetTransactions {
 
 		if (payload) {
 			const { id } = payload;
-			await this.getTransactionsRepository.get(id, filters);
+			const transactions = await this.getTransactionsRepository.get(id, filters);
+			if (transactions) {
+				return transactions;
+			}
 		}
 		return null;
 	}
