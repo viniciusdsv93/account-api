@@ -63,6 +63,10 @@ Para construção da API foi aplicado o TDD, realizando testes unitários para g
 
 É possível executar o comando "npm run test:ci" para executar todos os testes e ao final verificar o percentual de cobertura de testes da aplicação inteira.
 
+Cobertura:
+
+![](./tests-coverage.jpeg)
+
 ### Aplicação da Clean Archtecture
 
 Para estruturação das camadas da API, foram aplicados os princípios da Clean Archtecture desenvolvida por Robert Martin a fim de segregar os componentes em camadas com o intuito de reduzir o acoplamento entre elas.
@@ -113,19 +117,22 @@ Quanto ao princípio da Interface Segregation, optou-se por particionar as funci
 
 ## Execução
 
-<!-- Para executar a aplicação localmente, é preciso primeiro iniciar o container docker com a instância do MariaDB, onde são persistidos os dados.
+Para executar a aplicação localmente, é preciso primeiro iniciar o container docker com a instância do PostgreSQL, onde são persistidos os dados.
 
-Para isso é preciso, com o docker em funcionamento, executar no terminal o comando "docker run --name calculator-mariadb -p 3306:3306 --env MARIADB_USER=root --env MARIADB_PASSWORD=password --env MARIADB_ROOT_PASSWORD=password --env MARIADB_DATABASE=calculator-mariadb -d mariadb:latest".
+Para isso é preciso, com o docker em funcionamento, executar no terminal o comando "docker-compose up".
 
-Depois, será necessário executar "docker start calculator-mariadb" no terminal para iniciar o container. -->
+Depois, será necessário instalar as dependências executando o comando "npm install".
 
-Após, é preciso executar "npm install" para instalar todas as dependências da aplicação.
+Após, será preciso executar o Prisma para criar as tabelas no banco de dados conforme as migrations configuradas, executando "npx prisma migrate dev".
+
+É possível executar o "npx prisma studio" para visualizar no navegador as tabelas do banco de dados geradas.
+
+Então, é necessário executar "npm run dev" para executar a aplicação em modo de desenvolvimento, sendo possível consumir os endpoints por um http client como Postman ou Insomnia.
 
 Para executar a aplicação em modo de produção, é preciso executar "npm run build" para executar a transpilação do projeto de Typescript para Javascript, e então executar "npm start".
+
+Para visualizar a cobertura de testes, é possível executar "npm run test:ci".
 
 ## Autor
 
 -   GitHub - Vinícius dos Santos Verissimo (https://github.com/viniciusdsv93)
-
-
-docker: docker run --name account-management -p 5432:5432 -e POSTGRES_DB=account_management_db -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=password -d postgres:10-alpine
